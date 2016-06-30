@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="style.css"></link>
+	</head>
+	<body ng-app="activityTracker">
+		<base href="/">
+		<div ng-controller="MainController">
+			<nav class="main-nav">
+				<a href="#statistics">statistics</a>
+				<a href="#tags">tags</a>
+			</nav>
+			<section class="main" ng-view>
+			</section>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/angular.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/angular-route.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/angular-loader.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/c3-angular/1.2.0/c3-angular.min.js"></script>
+			<script src="js/activitytracker.js"></script>
+		</div>
+	</body>
+</html>
