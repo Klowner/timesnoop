@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -30,13 +29,9 @@ func (d *Database) TotalsForDay(day time.Time) <-chan TotalStatisticsRecord {
 	go func() {
 		for rows.Next() {
 			var record TotalStatisticsRecord
-			var date1 string
-			var date2 string
 
-			//err := rows.Scan(&title, &duration, &date)
 			err := rows.Scan(&record.Title, &record.Duration)
 
-			fmt.Printf(date1 + " " + date2 + "\n")
 			if err != nil {
 				panic(err)
 			}
