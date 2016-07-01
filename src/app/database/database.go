@@ -14,7 +14,7 @@ type Database struct {
 }
 
 func (d *Database) Open() bool {
-	db, err := sql.Open("sqlite3", "./activitymonitor.db")
+	db, err := sql.Open("sqlite3", "./timesnoop.dat")
 	checkErr(err)
 
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS event_log(at timestamp, duration integer, title text)")
