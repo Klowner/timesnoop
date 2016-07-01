@@ -10,8 +10,6 @@ type TotalStatisticsRecord struct {
 }
 
 func (d *Database) TotalsForDay(day time.Time) <-chan TotalStatisticsRecord {
-
-	//WHERE date(at) == date(?)
 	rows, err := d.connection.Query(`
 		SELECT title, sum(duration)
 			FROM event_log

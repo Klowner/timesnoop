@@ -17,17 +17,20 @@ func (d *Database) Open() bool {
 	db, err := sql.Open("sqlite3", "./timesnoop.dat")
 	checkErr(err)
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS event_log(at timestamp, duration integer, title text)")
-	checkErr(err)
+	d.connection = db
+	d.CreateSchema()
 
-	_, err = db.Exec("CREATE INDEX IF NOT EXISTS event_log_title_idx ON event_log(title)")
-	checkErr(err)
+	//_, err = db.Exec("CREATE TABLE IF NOT EXISTS event_log(at timestamp, duration integer, title text)")
+	//checkErr(err)
 
-	_, err = db.Exec("CREATE INDEX IF NOT EXISTS event_log_at_idx ON event_log(at)")
-	checkErr(err)
+	//_, err = db.Exec("CREATE INDEX IF NOT EXISTS event_log_title_idx ON event_log(title)")
+	//checkErr(err)
 
-	_, err = db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS event_log_at_title_idx ON event_log(at, title)")
-	checkErr(err)
+	//_, err = db.Exec("CREATE INDEX IF NOT EXISTS event_log_at_idx ON event_log(at)")
+	//checkErr(err)
+
+	//_, err = db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS event_log_at_title_idx ON event_log(at, title)")
+	//checkErr(err)
 
 	stmt_insert, err := db.Prepare("INSERT INTO event_log(at, duration, title) values (?, ?, ?)")
 	checkErr(err)
@@ -40,7 +43,6 @@ func (d *Database) Open() bool {
 		)`)
 	checkErr(err)
 
-	d.connection = db
 	d.stmt_insert = stmt_insert
 	d.stmt_merge = stmt_merge
 
