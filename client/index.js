@@ -3,6 +3,7 @@ var app = require('./app'),
 
 // Style
 require('./style/main.scss');
+require('../node_modules/c3/c3.min.css');
 
 // Components
 require('./controllers')(app);
