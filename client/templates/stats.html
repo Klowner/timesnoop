@@ -3,6 +3,6 @@
 
 	<li ng-repeat="record in collection">
 		{{ record.title }}
-		{{ record.duration }}
+		{{ record.duration | secondsToTime }}
 	</li>
 </ul>

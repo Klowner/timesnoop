@@ -7,6 +7,7 @@ require('./style/main.scss');
 // Components
 require('./controllers')(app);
 require('./services')(app);
+require('./filters')(app);
 require('./directives')(app);
 require('./config')(app);
 
