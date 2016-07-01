@@ -1,0 +1,34 @@
+{
+  "name": "activitymonitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.klowner.com:mark/activitytracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "1.5.7",
+    "angular-resource": "1.5.7",
+    "angular-ui-router": "^0.3.0",
+    "babel-core": "^6.10.4",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "c3": "^0.4.11",
+    "c3-angularjs": "^1.0.7",
+    "css-loader": "^0.23.1",
+    "file-loader": "^0.9.0",
+    "html-loader": "^0.4.3",
+    "lodash": "^4.13.1",
+    "node-sass": "^3.8.0",
+    "sass-loader": "^4.0.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1",
+    "webpack-split-by-path": "0.0.10"
+  }
+}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+	</head>
+	<body ng-app="activityTracker">
+		<base href="/">
+		<div ng-controller="MainController">
+			<nav class="main-nav">
+				<a href="#stats">statistics</a>
+				<a href="#tags">tags</a>
+			</nav>
+			<section class="main" ui-view>
+			</section>
+			<script src="libs.js"></script>
+			<script src="main.js"></script>
+		</div>
+	</body>
+</html>

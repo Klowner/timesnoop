@@ -18,6 +18,8 @@ func routes(_db *database.Database) {
 	r := mux.NewRouter()
 	r.HandleFunc("/stats/day/{date:[0-9]{4}-[0-9]{2}-[0-9]{1,2}}", totalsForDayHandler)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+	//r.PathPrefix("/").Handler(http.FileServer(
+	//&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "static"}))
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe("0.0.0.0:8228", nil))
 }
