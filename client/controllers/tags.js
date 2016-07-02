@@ -6,8 +6,8 @@ module.exports = function (app) {
 		$scope.tag = {};
 
 		$scope.addTag = function () {
-			console.log('add tag', $scope.tag);
-
+			Tag.save($scope.tag);
+			$scope.tags.push($scope.tag);
 		};
 	});
 };

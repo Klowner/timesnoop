@@ -17,7 +17,9 @@ func routes(_db *database.Database) {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/stats/day/{date:[0-9]{4}-[0-9]{2}-[0-9]{1,2}}", totalsForDayHandler)
-	r.HandleFunc("/api/tags", getTagsHandler)
+	r.HandleFunc("/tags", TagIndex).Methods("GET")
+	r.HandleFunc("/tags/{name}", TagGet).Methods("GET", "POST")
+	r.HandleFunc("/tags", TagCreate).Methods("POST")
 
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	//r.PathPrefix("/").Handler(http.FileServer(
@@ -41,9 +43,24 @@ func totalsForDayHandler(wr http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func getTagsHandler(w http.ResponseWriter, r *http.Request) {
+func TagIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	j, _ := json.Marshal(database.GetDB().GetTags())
 	w.Write(j)
+}
+
+func TagCreate(w http.ResponseWriter, r *http.Request) {
+	tag := new(database.Tag)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&tag)
+	if err != nil {
+		panic(err)
+	}
+
+	j, _ := json.Marshal(database.GetDB().CreateTag(tag))
+	w.Write(j)
+}
+
+func TagGet(w http.ResponseWriter, r *http.Request) {
 }

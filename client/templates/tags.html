@@ -1,5 +1,5 @@
 <div>
-	{{ tags }}
+	<div ng-repeat="tag in tags">{{ tag.name }}</div>
 </div>
 
 <form ng-submit="addTag()">

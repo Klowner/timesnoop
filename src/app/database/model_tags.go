@@ -7,7 +7,7 @@ type Tag struct {
 }
 
 func (d *Database) GetTags() []Tag {
-	rows, err := d.connection.Query("SELECT name, parent_name, color FROM tags")
+	rows, err := d.connection.Query("SELECT name, parent_name, color FROM tags ORDER BY name")
 	if err != nil {
 		panic(err)
 	}
@@ -22,4 +22,15 @@ func (d *Database) GetTags() []Tag {
 		results = append(results, record)
 	}
 	return results
+}
+
+func (d *Database) CreateTag(tag *Tag) *Tag {
+	_, err := d.connection.Exec("INSERT INTO tags (name, parent_name, color) VALUES (?, ?, ?)",
+		tag.Name, tag.ParentName, tag.Color)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return tag
 }
