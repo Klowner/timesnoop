@@ -11,7 +11,7 @@ func main() {
 	events, eventsQuit := xdotool.StartTracking()
 
 	db := database.Initialize(events)
-	routes(&db)
+	routes(db)
 
 	switch {
 	case <-db.C:

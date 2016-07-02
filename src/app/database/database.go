@@ -7,10 +7,21 @@ import (
 )
 
 type Database struct {
-	connection  *sql.DB
-	stmt_insert *sql.Stmt
-	stmt_merge  *sql.Stmt
-	C           chan bool
+	connection           *sql.DB
+	stmt_log_insert      *sql.Stmt
+	stmt_daily_insert    *sql.Stmt
+	stmt_daily_summarize *sql.Stmt
+	C                    chan bool
+}
+
+var db *Database = nil
+
+func GetDB() *Database {
+	if db == nil {
+		db = &Database{}
+		db.Open()
+	}
+	return db
 }
 
 func (d *Database) Open() bool {
@@ -19,44 +30,18 @@ func (d *Database) Open() bool {
 
 	d.connection = db
 	d.CreateSchema()
-
-	//_, err = db.Exec("CREATE TABLE IF NOT EXISTS event_log(at timestamp, duration integer, title text)")
-	//checkErr(err)
-
-	//_, err = db.Exec("CREATE INDEX IF NOT EXISTS event_log_title_idx ON event_log(title)")
-	//checkErr(err)
-
-	//_, err = db.Exec("CREATE INDEX IF NOT EXISTS event_log_at_idx ON event_log(at)")
-	//checkErr(err)
-
-	//_, err = db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS event_log_at_title_idx ON event_log(at, title)")
-	//checkErr(err)
-
-	stmt_insert, err := db.Prepare("INSERT INTO event_log(at, duration, title) values (?, ?, ?)")
-	checkErr(err)
-
-	stmt_merge, err := db.Prepare(`
-		INSERT OR REPLACE INTO event_log (at, duration, title) VALUES (
-			COALESCE((SELECT at FROM event_log WHERE title = ? AND at > date() ORDER BY at DESC LIMIT 1), ?),
-			COALESCE((SELECT sum(duration) FROM event_log WHERE title = ?), 0) + ?,
-			?
-		)`)
-	checkErr(err)
-
-	d.stmt_insert = stmt_insert
-	d.stmt_merge = stmt_merge
+	d.PrepareStatements()
 
 	return false
 }
 
 func (d *Database) RecordEvent(event xdotool.FocusEvent) {
-	_, err := d.stmt_insert.Exec(event.Start, event.Duration, event.Title)
+	_, err := d.stmt_log_insert.Exec(event.Start, event.Duration, event.Title)
 	checkErr(err)
 }
 
-func Initialize(events <-chan xdotool.FocusEvent) Database {
-	database := Database{}
-	database.Open()
+func Initialize(events <-chan xdotool.FocusEvent) *Database {
+	database := GetDB()
 
 	go func() {
 		for event := range events {

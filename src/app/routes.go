@@ -17,6 +17,8 @@ func routes(_db *database.Database) {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/stats/day/{date:[0-9]{4}-[0-9]{2}-[0-9]{1,2}}", totalsForDayHandler)
+	r.HandleFunc("/api/tags", getTagsHandler)
+
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	//r.PathPrefix("/").Handler(http.FileServer(
 	//&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "static"}))
@@ -25,7 +27,6 @@ func routes(_db *database.Database) {
 }
 
 func totalsForDayHandler(wr http.ResponseWriter, req *http.Request) {
-
 	vars := mux.Vars(req)
 	datestring := vars["date"]
 
@@ -34,16 +35,15 @@ func totalsForDayHandler(wr http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	records := db.TotalsForDay(date)
-
-	s := make([]database.TotalStatisticsRecord, 0)
-	for record := range records {
-		s = append(s, record)
-	}
-
 	wr.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(wr).Encode(s); err != nil {
+	if err := json.NewEncoder(wr).Encode(db.TotalsForDay(date)); err != nil {
 		panic(err)
 	}
+}
 
+func getTagsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	j, _ := json.Marshal(database.GetDB().GetTags())
+	w.Write(j)
 }

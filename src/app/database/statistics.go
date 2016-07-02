@@ -4,16 +4,17 @@ import (
 	"time"
 )
 
-type TotalStatisticsRecord struct {
+type TotalsRecord struct {
 	Title    string  `json:"title"`
 	Duration float64 `json:"duration"`
 }
 
-func (d *Database) TotalsForDay(day time.Time) <-chan TotalStatisticsRecord {
+func (d *Database) TotalsForDay(day time.Time) []TotalsRecord {
+
 	rows, err := d.connection.Query(`
 		SELECT title, sum(duration)
 			FROM event_log
-			WHERE datetime(at, 'start of day') == datetime(?)
+			WHERE datetime(ts, 'start of day') == datetime(?)
 			GROUP BY title
 			ORDER BY sum(duration) DESC
 		`, day)
@@ -22,22 +23,14 @@ func (d *Database) TotalsForDay(day time.Time) <-chan TotalStatisticsRecord {
 		panic(err)
 	}
 
-	statistics := make(chan TotalStatisticsRecord)
-
-	go func() {
-		for rows.Next() {
-			var record TotalStatisticsRecord
-
-			err := rows.Scan(&record.Title, &record.Duration)
-
-			if err != nil {
-				panic(err)
-			}
-
-			statistics <- record
+	results := make([]TotalsRecord, 0)
+	for rows.Next() {
+		var record TotalsRecord
+		err := rows.Scan(&record.Title, &record.Duration)
+		if err != nil {
+			panic(err)
 		}
-		close(statistics)
-	}()
-
-	return statistics
+		results = append(results, record)
+	}
+	return results
 }
