@@ -1,8 +1,13 @@
 module.exports = function (app) {
-	app.controller('TagsController', function ($scope, TagsService) {
+	app.controller('TagsController', function ($scope, Tag) {
 
-		$scope.tags = TagsService.query();
+		$scope.tags = Tag.query();
 
-		console.log(TagsService);
+		$scope.tag = {};
+
+		$scope.addTag = function () {
+			console.log('add tag', $scope.tag);
+
+		};
 	});
 };
