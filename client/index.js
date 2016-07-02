@@ -1,3 +1,4 @@
+//@require "../templates/**.html"
 var app = require('./app'),
 	controllers = require('./controllers');
 
@@ -12,7 +13,11 @@ require('./filters')(app);
 require('./directives')(app);
 require('./config')(app);
 
-app.run(function () {
+app.run(function ($templateCache) {
+
+	$templateCache.put('templates/forms/tag.html', require('./templates/forms/tag.html'));
+
+	console.log('templtecache');
 	console.log('running app');
 });
 

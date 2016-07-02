@@ -29,7 +29,7 @@ module.exports = {
 		loaders: [
 			{ test: /\.css$/, loader: 'style!css' },
 			{ test: /\.html$/, loader: 'html' },
-			{ test: /\.jsx?$/, loader: 'babel?presets[]=es2015', exclude: /node_modules/ },
+			{ test: /\.jsx?$/, loaders: ['babel?presets[]=es2015', 'required?import[]=angular'], exclude: /node_modules/ },
 			{ test: /\.scss$/, loader: 'style!css!sass' }
 		]
 	},

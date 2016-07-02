@@ -14,7 +14,14 @@ module.exports = function (app) {
 				url: '/stats',
 				template: require('../templates/stats.html'),
 				controller: 'StatsController'
-			});
+			})
+
+			.state('tags', {
+				url: '/tags',
+				template: require('../templates/tags.html'),
+				controller: 'TagsController'
+			})
+		;
 
 		$urlRouterProvider.otherwise('/');
 
