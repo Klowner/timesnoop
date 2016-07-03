@@ -1,0 +1,12 @@
+<form ng-submit="addMatcher()">
+	<input type="text" size=50 ng-model="matcher.description" />
+	<input type="text" size=50 ng-model="matcher.expression" ng-class="{'invalid': !valid}"/>
+	<br/>
+	<input type="submit" value="add" />
+</form>
+
+<div>
+	<div ng-repeat="entry in entries" ng-class="{'matches': matchesMatcher(this)}">
+		{{ entry.title }}
+	</div>
+</div>

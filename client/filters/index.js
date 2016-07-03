@@ -1,3 +1,4 @@
 module.exports = function (app) {
-	return require('./secondstotime')(app);
+	require('./secondstotime')(app);
+	require('./matches')(app);
 };

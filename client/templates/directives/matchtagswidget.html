@@ -1,0 +1,11 @@
+<ul class="tag-chooser">
+	<li class="tag" ng-repeat="tag in matcher.tags">{{ tag.name }}</li>
+	<li class="add">
+		<input type="button" ng-click="enableTagMenu()" value="add"/>
+		<ul class="tag-menu">
+			<li ng-repeat="tag in availableTags" ng-style="{'background-color': tag.color}">
+				<input type="button" ng-click="addTag(tag)" value="{{tag.name}}"/>
+			</li>
+		</ul>
+	</li>
+</ul>

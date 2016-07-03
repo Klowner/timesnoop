@@ -53,6 +53,10 @@ func (d *Database) CreateSchema() {
 			FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE,
 			FOREIGN KEY(me_id) REFERENCES match_expressions(id) ON DELETE CASCADE
 		)`,
+
+		"CREATE INDEX IF NOT EXISTS me2tags_tag_id_idx ON me2tags(tag_id)",
+		"CREATE INDEX IF NOT EXISTS me2tags_me_id_idx ON me2tags(me_id)",
+		"CREATE UNIQUE INDEX IF NOT EXISTS me2tags_unique_idx ON me2tags(tag_id, me_id)",
 	}
 
 	for _, statement := range statements {

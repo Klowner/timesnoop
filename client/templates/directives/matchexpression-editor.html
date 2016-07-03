@@ -1,0 +1,29 @@
+<table>
+	<thead>
+		<tr>
+			<th>Description</th>
+			<th>Expression</th>
+			<th>Tags</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="matcher in matchers">
+			<td>{{ matcher.description }}</td>
+			<td>{{ matcher.expression }}</td>
+			<td>
+				<match-tags-widget matcher="matcher"/>
+			</td>
+			<td>
+				<input type="button" ng-click="deleteMatcher(matcher)" value="delete"/>
+			</td>
+		</tr>
+		<tr>
+			<td><input type="text" ng-model="matcher.description"/></td>
+			<td><input type="text" ng-model="matcher.expression"/></td>
+			<td></td>
+			<td>
+				<input type="button" ng-click="addMatcher(matcher)" value="append"/>
+			</td>
+		</tr>
+	</tbody>
+</table>

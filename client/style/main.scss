@@ -64,3 +64,43 @@ form {
     display: inline-block;
   }
 }
+
+.invalid {
+  background-color: $pink;
+}
+
+.matches {
+  color: $green;
+}
+
+.tag {
+  border: 1px solid #fff;
+}
+
+.tag-chooser {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: relative;
+
+  .tag-menu {
+    padding: 0;
+    top: 0;
+    background: #fff;
+    position: absolute;
+    list-style: none;
+    max-height: 10em;
+    overflow-y: auto;
+
+    & > li {
+      margin: 0;
+      padding: 0;
+    }
+
+    input {
+      border: none;
+      background: none;
+      width: 100%;
+    }
+  }
+}

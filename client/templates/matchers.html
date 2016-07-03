@@ -1,7 +1,7 @@
+<!--
 <form ng-submit="addMatcher()">
-	<div ng-include="'templates/forms/matcher.html'" />
+	<div ng-include="'templates/forms/matcher.html'"></div>
 </form>
+-->
+<match-expression-editor matchers="matchers"></match-expression-editor>
 
-<div>
-	<div ng-repeat="matcher in matchers">{{ matcher.name }}</div>
-</div>

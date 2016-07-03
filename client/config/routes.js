@@ -27,6 +27,12 @@ module.exports = function (app) {
 				template: require('../templates/matchers.html'),
 				controller: 'MatchersController'
 			})
+
+			.state('categorize', {
+				url: '/categorize',
+				template: require('../templates/categorize.html'),
+				controller: 'CategorizeController'
+			})
 		;
 
 		$urlRouterProvider.otherwise('/');
