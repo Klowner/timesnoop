@@ -26,23 +26,25 @@ func (d *Database) CreateSchema() {
 
 		// Tags facilitate grouping matched patterns into a hierarchy for reporting
 		`CREATE TABLE IF NOT EXISTS tags(
-			name text PRIMARY KEY,
-			parent_name text,
+			id INTEGER PRIMARY KEY,
+			parent_id integer,
+			name text,
 			color text)`,
 
 		"CREATE INDEX IF NOT EXISTS tag_name_idx ON tags(name)",
-		"CREATE INDEX IF NOT EXISTS tag_parent_name_idx ON tags(parent_name)",
+		"CREATE INDEX IF NOT EXISTS tag_parent_id_idx ON tags(parent_id)",
 
 		// Match expressions link patterns with specific tags, a tag can
 		// be defined by any number of match expressions.
-		`CREATE TABLE IF NOT EXISTS match_expression(
+		`CREATE TABLE IF NOT EXISTS match_expressions(
+			id INTEGER PRIMARY KEY,
 			tag_id integer,
 			description text,
 			expression text
 		)`,
 
-		"CREATE INDEX IF NOT EXISTS match_expression_idx ON match_expression(description)",
-		"CREATE INDEX IF NOT EXISTS match_expression_tag_id_idx ON match_expression(tag_id)",
+		"CREATE INDEX IF NOT EXISTS match_expression_idx ON match_expressions(description)",
+		"CREATE INDEX IF NOT EXISTS match_expression_tag_id_idx ON match_expressions(tag_id)",
 	}
 
 	for _, statement := range statements {
