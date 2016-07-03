@@ -16,8 +16,8 @@ require('./config')(app);
 app.run(function ($templateCache) {
 
 	$templateCache.put('templates/forms/tag.html', require('./templates/forms/tag.html'));
+	$templateCache.put('templates/forms/matcher.html', require('./templates/forms/matcher.html'));
 
-	console.log('templtecache');
 	console.log('running app');
 });
 

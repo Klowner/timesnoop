@@ -21,6 +21,12 @@ module.exports = function (app) {
 				template: require('../templates/tags.html'),
 				controller: 'TagsController'
 			})
+
+			.state('matchers', {
+				url: '/matchers',
+				template: require('../templates/matchers.html'),
+				controller: 'MatchersController'
+			})
 		;
 
 		$urlRouterProvider.otherwise('/');

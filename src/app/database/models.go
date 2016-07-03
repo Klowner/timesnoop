@@ -9,7 +9,6 @@ type Tag struct {
 
 type MatchExpression struct {
 	Id          int    `json:"id"`
-	TagId       int    `json:"tag_id"`
 	Description string `json:"description"`
 	Expression  string `json:"expression"`
 }
@@ -53,8 +52,7 @@ func (d *Database) CreateTag(tag *Tag) *Tag {
 }
 
 func (d *Database) CreateMatchExpression(expr *MatchExpression) *MatchExpression {
-	_, err := d.connection.Exec("INSERT INTO match_expressions (tag_id, description, expression) VALUES (?, ?, ?)",
-		expr.TagId,
+	_, err := d.connection.Exec("INSERT INTO match_expressions (description, expression) VALUES (?, ?, ?)",
 		expr.Description,
 		expr.Expression,
 	)

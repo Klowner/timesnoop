@@ -1,0 +1,7 @@
+<form ng-submit="addMatcher()">
+	<div ng-include="'templates/forms/matcher.html'" />
+</form>
+
+<div>
+	<div ng-repeat="matcher in matchers">{{ matcher.name }}</div>
+</div>

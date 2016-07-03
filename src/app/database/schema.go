@@ -3,6 +3,8 @@ package database
 func (d *Database) CreateSchema() {
 	statements := []string{
 
+		"PRAGMA foreign_keys = ON",
+
 		// This table contains every title transition and will likely get
 		// very large unless it is routinely condensed and cleaned.
 		`CREATE TABLE IF NOT EXISTS event_log(
@@ -38,13 +40,19 @@ func (d *Database) CreateSchema() {
 		// be defined by any number of match expressions.
 		`CREATE TABLE IF NOT EXISTS match_expressions(
 			id INTEGER PRIMARY KEY,
-			tag_id integer,
 			description text,
 			expression text
 		)`,
 
 		"CREATE INDEX IF NOT EXISTS match_expression_idx ON match_expressions(description)",
-		"CREATE INDEX IF NOT EXISTS match_expression_tag_id_idx ON match_expressions(tag_id)",
+
+		// Match expression <-> tag many-to-many table
+		`CREATE TABLE IF NOT EXISTS me2tags(
+			tag_id INTEGER,
+			me_id INTEGER,
+			FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE,
+			FOREIGN KEY(me_id) REFERENCES match_expressions(id) ON DELETE CASCADE
+		)`,
 	}
 
 	for _, statement := range statements {
