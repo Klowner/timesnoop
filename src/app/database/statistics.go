@@ -73,7 +73,7 @@ func EventsChannelToSlice(in <-chan EventRecord) []EventRecord {
 
 func (d *Database) EventsAllChannel() <-chan EventRecord {
 	return d.eventsQueryAsChannel(`
-		SELECT title, sum(duration),
+		SELECT title, sum(duration)
 		FROM event_log
 		GROUP BY title
 		ORDER BY sum(duration) DESC

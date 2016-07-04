@@ -24,6 +24,7 @@ func routes(_db *database.Database) {
 	r := mux.NewRouter()
 	r.HandleFunc("/stats/day/{date:[0-9]{4}-[0-9]{2}-[0-9]{1,2}}", totalsForDayHandler)
 	r.HandleFunc("/stats/unmatched", totalsUnmatchedHandler)
+	r.HandleFunc("/stats/tags", totalsByTagHandler)
 	r.HandleFunc("/tags", TagIndex).Methods("GET")
 	r.HandleFunc("/tags/{name}", TagGet).Methods("GET", "POST")
 	r.HandleFunc("/tags", TagCreate).Methods("POST")
@@ -146,4 +147,13 @@ func Matcher2TagCreate(w http.ResponseWriter, r *http.Request) {
 func Matcher2TagDelete(w http.ResponseWriter, r *http.Request) {
 	params := parseM2TParams(r)
 	database.GetDB().M2TDestroy(params.MId, params.TId)
+}
+
+func totalsByTagHandler(w http.ResponseWriter, r *http.Request) {
+	events_all := database.GetDB().EventsAllChannel()
+	totals := GetTotalsByTag(events_all)
+
+	w.Header().Set("Content-Type", "application/json")
+	j, _ := json.Marshal(totals)
+	w.Write(j)
 }

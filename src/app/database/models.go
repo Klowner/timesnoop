@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"strconv"
 	"strings"
 )
@@ -43,6 +44,42 @@ func (d *Database) GetTags() []Tag {
 	return results
 }
 
+func (d *Database) GetTagById(id uint64) Tag {
+	rows, err := d.connection.Query("SELECT id, parent_id, name, color FROM tags WHERE id=? LIMIT 1", id)
+	if err != nil {
+		panic(err)
+	}
+	record := Tag{}
+	err = rows.Scan(
+		&record.Id,
+		&record.ParentId,
+		&record.Name,
+		&record.Color)
+	if err != nil {
+		panic(err)
+	}
+	return record
+}
+
+func (d *Database) GetTagsForMatcher(matcherId int) []Tag {
+	rows, err := d.connection.Query(`
+		WITH j AS (SELECT tag_id FROM me2tags WHERE me_id=?)
+		SELECT id, parent_id, name, color
+		FROM tags
+		WHERE tags.id IN j
+	`, matcherId)
+
+	if err != nil {
+		panic(err)
+	}
+
+	records := []Tag{}
+	for rows.Next() {
+		records = append(records, *queryResultToTag(rows))
+	}
+	return records
+}
+
 func (d *Database) CreateTag(tag *Tag) *Tag {
 	_, err := d.connection.Exec("INSERT INTO tags (parent_id, name, color) VALUES (?, ?, ?)",
 		tag.ParentId,
@@ -82,6 +119,23 @@ func processTagIds(ids []byte) []int64 {
 		out = append(out, int64(j))
 	}
 	return out
+}
+
+func queryResultToTag(rows *sql.Rows) *Tag {
+	record := Tag{}
+
+	err := rows.Scan(
+		&record.Id,
+		&record.ParentId,
+		&record.Name,
+		&record.Color,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return &record
 }
 
 func (d *Database) GetMatchExpressions() []MatchExpression {

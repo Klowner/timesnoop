@@ -4,4 +4,17 @@ module.exports = function (app) {
 			getData: {method:'GET', isArray: true},
 		});
 	});
+
+	app.factory('Stats', function ($http) {
+		var url = '/stats';
+
+		return {
+			getTagTotals: function () {
+				return $http({
+					url: url + '/tags',
+					method: 'GET'
+				});
+			}
+		};
+	});
 };
