@@ -34,12 +34,8 @@ func (d *Database) TotalsForDay(day time.Time) []EventRecord {
 	return results
 }
 
-func (d *Database) EventsAllChannel() <-chan EventRecord {
-	rows, err := d.connection.Query(`
-		SELECT title, sum(duration)
-		FROM event_log
-		GROUP BY title
-		ORDER BY sum(duration) DESC`)
+func (d *Database) eventsQueryAsChannel(query string, params ...interface{}) <-chan EventRecord {
+	rows, err := d.connection.Query(query, params...)
 
 	if err != nil {
 		panic(err)
@@ -67,10 +63,37 @@ func (d *Database) EventsAllChannel() <-chan EventRecord {
 	return out
 }
 
-func (d *Database) EventsAll() []EventRecord {
+func EventsChannelToSlice(in <-chan EventRecord) []EventRecord {
 	out := make([]EventRecord, 0)
-	for record := range d.EventsAllChannel() {
+	for record := range in {
 		out = append(out, record)
 	}
 	return out
+}
+
+func (d *Database) EventsAllChannel() <-chan EventRecord {
+	return d.eventsQueryAsChannel(`
+		SELECT title, sum(duration),
+		FROM event_log
+		GROUP BY title
+		ORDER BY sum(duration) DESC
+	`)
+}
+
+func (d *Database) EventsAll() []EventRecord {
+	return EventsChannelToSlice(d.EventsAllChannel())
+}
+
+func (d *Database) EventsTotalsForDayChannel(day time.Time) <-chan EventRecord {
+	return d.eventsQueryAsChannel(`
+		SELECT title, sum(duration),
+		FROM event_log
+		WHERE datetime(ts, 'start of day') == datetime(?)
+		GROUP BY title
+		ORDER BY sum(duration)
+	`, day)
+}
+
+func (d *Database) EventsTotalsForDay(day time.Time) []EventRecord {
+	return EventsChannelToSlice(d.EventsTotalsForDayChannel(day))
 }
