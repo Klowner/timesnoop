@@ -2,6 +2,11 @@
 	<input type="text" size=50 ng-model="matcher.description" />
 	<input type="text" size=50 ng-model="matcher.expression" ng-class="{'invalid': !valid}"/>
 	<br/>
+	<select
+		ng-options="tag.id as tag.name for tag in tags"
+		ng-model="matcher.tag_id">
+	</select>
+
 	<input type="submit" value="add" />
 </form>
 

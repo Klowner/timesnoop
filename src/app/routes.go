@@ -25,6 +25,7 @@ func routes(_db *Database) {
 	r.HandleFunc("/tags", TagIndex).Methods("GET")
 	r.HandleFunc("/tags/{name}", TagGet).Methods("GET", "POST")
 	r.HandleFunc("/tags", TagCreate).Methods("POST")
+	r.HandleFunc("/tags/{id}", tagDeleteHandler).Methods("DELETE")
 
 	r.HandleFunc("/matchers", MatcherIndex).Methods("GET")
 	r.HandleFunc("/matchers/{id}", MatcherGet).Methods("GET", "POST")
@@ -91,6 +92,12 @@ func TagCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func TagGet(w http.ResponseWriter, r *http.Request) {
+}
+
+func tagDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+	GetDB().DeleteTagById(id)
 }
 
 func MatcherCreate(w http.ResponseWriter, r *http.Request) {

@@ -15,12 +15,19 @@ module.exports = function (app) {
 	});
 
 
-	app.controller('CategorizeController', function ($scope, $http, Matcher) {
+	app.controller('CategorizeController', function ($scope, $http, Matcher, Tag) {
 		var expression;
 
 		$scope.entries = [];
 		$scope.matcher = {};
 		$scope.valid = true;
+		$scope.tags = Tag.query();
+
+		$scope.tags.$promise.then(function () {
+			if (!$scope.matcher.tag_id && $scope.tags.length) {
+				$scope.matcher.tag_id = $scope.tags[0].id;
+			}
+		});
 
 		$scope.updateRecords = function () {
 			return $http({
@@ -47,7 +54,6 @@ module.exports = function (app) {
 		});
 
 		$scope.addMatcher = function () {
-			console.log('add matcher');
 			var m = new Matcher($scope.matcher);
 			m.$save()
 				.then($scope.updateRecords);

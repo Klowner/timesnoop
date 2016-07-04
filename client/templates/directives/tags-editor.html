@@ -1,0 +1,43 @@
+<table class="fullsize-editor">
+	<thead>
+		<tr>
+			<th>Parent</th>
+			<th>Name</th>
+			<th>Color</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="tag in tags" ng-style="{'background-color': tag.color}">
+			<td>
+				<select name="parent"
+					ng-options="tag.id as tag.name for tag in tags"
+					ng-model="tag.parent_id"
+					>
+				</select>
+			</td>
+			<td><input type="text" ng-model="tag.name"/></td>
+			<td><input type="text" ng-model="tag.color"/></td>
+			<td>
+				<input type="button" ng-click="deleteTag(tag)" value="delete"/>
+			</td>
+		</tr>
+
+		<tr ng-style="{'background-color': tag.color}">
+			<td>
+				<select name="parent"
+					value="None"
+					ng-options="tag.id as tag.name for tag in tags"
+					ng-model="tag.parent_id"
+					>
+				</select>
+			</td>
+			<td><input type="text" ng-model="tag.name"/></td>
+			<td><input type="text" ng-model="tag.color"/></td>
+			<td>
+				<input type="button" ng-click="addTag(tag)" value="add"/>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+{{ tag }}

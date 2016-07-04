@@ -1,7 +1,10 @@
-<div>
-	<div ng-repeat="tag in tags">{{ tag.name }}</div>
-</div>
+
+<tags-editor tags="tags"></tags-editor>
 
 <form ng-submit="addTag()">
 	<div ng-include="'templates/forms/tag.html'" />
 </form>
+
+<div>
+	<div ng-repeat="tag in tags">{{ tag.name }}!</div>
+</div>

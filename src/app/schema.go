@@ -2,9 +2,6 @@ package main
 
 func (d *Database) CreateSchema() {
 	statements := []string{
-
-		"PRAGMA foreign_keys = ON",
-
 		// This table contains every title transition and will likely get
 		// very large unless it is routinely condensed and cleaned.
 		`CREATE TABLE IF NOT EXISTS event_log(
@@ -38,25 +35,29 @@ func (d *Database) CreateSchema() {
 
 		// Match expressions link patterns with specific tags, a tag can
 		// be defined by any number of match expressions.
-		`CREATE TABLE IF NOT EXISTS match_expressions(
+		`CREATE TABLE IF NOT EXISTS matchers(
 			id INTEGER PRIMARY KEY,
+			tag_id INTEGER,
+			expression text,
 			description text,
-			expression text
+			FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
 		)`,
 
-		"CREATE INDEX IF NOT EXISTS match_expression_idx ON match_expressions(description)",
+		"CREATE INDEX IF NOT EXISTS matchers_expression_idx ON matchers(description)",
+		"CREATE INDEX IF NOT EXISTS matchers_tag_id_idx ON matchers(tag_id)",
+		"CREATE INDEX IF NOT EXISTS matchers_id_idx ON matchers(id)",
 
 		// Match expression <-> tag many-to-many table
-		`CREATE TABLE IF NOT EXISTS me2tags(
-			tag_id INTEGER,
-			me_id INTEGER,
-			FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE,
-			FOREIGN KEY(me_id) REFERENCES match_expressions(id) ON DELETE CASCADE
-		)`,
+		//`CREATE TABLE IF NOT EXISTS me2tags(
+		//tag_id INTEGER,
+		//me_id INTEGER,
+		//FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE,
+		//FOREIGN KEY(me_id) REFERENCES matchers(id) ON DELETE CASCADE
+		//)`,
 
-		"CREATE INDEX IF NOT EXISTS me2tags_tag_id_idx ON me2tags(tag_id)",
-		"CREATE INDEX IF NOT EXISTS me2tags_me_id_idx ON me2tags(me_id)",
-		"CREATE UNIQUE INDEX IF NOT EXISTS me2tags_unique_idx ON me2tags(tag_id, me_id)",
+		//"CREATE INDEX IF NOT EXISTS me2tags_tag_id_idx ON me2tags(tag_id)",
+		//"CREATE INDEX IF NOT EXISTS me2tags_me_id_idx ON me2tags(me_id)",
+		//"CREATE UNIQUE INDEX IF NOT EXISTS me2tags_unique_idx ON me2tags(tag_id, me_id)",
 	}
 
 	for _, statement := range statements {

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"sync"
 )
 
 type Database struct {
@@ -13,6 +14,17 @@ type Database struct {
 	stmt_daily_insert    *sql.Stmt
 	stmt_daily_summarize *sql.Stmt
 	C                    chan bool
+	mutex                sync.Mutex
+}
+
+func (d *Database) WriteLock() *Database {
+	d.mutex.Lock()
+	return d
+}
+
+func (d *Database) WriteUnlock() *Database {
+	d.mutex.Unlock()
+	return d
 }
 
 var db *Database = nil
@@ -26,10 +38,11 @@ func GetDB() *Database {
 }
 
 func (d *Database) Open() bool {
-	fmt.Printf("OPENING DATABASE!\n\n\n")
+	fmt.Printf("opening database\n")
 	db, err := sql.Open("sqlite3", "./timesnoop.dat")
 	checkErr(err)
 
+	_, err = db.Exec("PRAGMA foreign_keys = on")
 	d.connection = db
 	d.CreateSchema()
 	d.PrepareStatements()
@@ -38,7 +51,10 @@ func (d *Database) Open() bool {
 }
 
 func (d *Database) RecordEvent(event xdotool.FocusEvent) {
+	d.WriteLock()
 	_, err := d.stmt_log_insert.Exec(event.Start, event.Duration, event.Title)
+	d.WriteUnlock()
+
 	checkErr(err)
 }
 

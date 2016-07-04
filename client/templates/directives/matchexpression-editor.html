@@ -11,7 +11,12 @@
 			<td>{{ matcher.description }}</td>
 			<td>{{ matcher.expression }}</td>
 			<td>
-				<match-tags-widget matcher="matcher" tags="tags"/>
+				<!--<match-tags-widget matcher="matcher" tags="tags"/>-->
+				<select
+					ng-options="tag.id as tag.name for tag in tags"
+					ng-model="matcher.tag_id"
+					>
+				</select>
 			</td>
 			<td>
 				<input type="button" ng-click="deleteMatcher(matcher)" value="delete"/>
@@ -20,7 +25,12 @@
 		<tr>
 			<td><input type="text" ng-model="matcher.description"/></td>
 			<td><input type="text" ng-model="matcher.expression"/></td>
-			<td></td>
+			<td>
+				<select name="tagSelect"
+					ng-options="tag.id as tag.name for tag in tags"
+					ng-model="matcher.tag_id">
+				</select>
+			</td>
 			<td>
 				<input type="button" ng-click="addMatcher(matcher)" value="append"/>
 			</td>

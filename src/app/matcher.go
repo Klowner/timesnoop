@@ -9,12 +9,7 @@ import (
 type CompiledMatchExpression struct {
 	Expr   *regexp.Regexp
 	Source *MatchExpression
-}
-
-type TagTotal struct {
-	TagId    int     `json:"id"`
-	Name     string  `json:"name"`
-	Duration float64 `json:"duration"`
+	Tag    *Tag
 }
 
 var compiled_expressions_mutex = &sync.Mutex{}
@@ -28,7 +23,9 @@ func NewCompiledMatchExpression(me MatchExpression) (*CompiledMatchExpression, e
 		return nil, err
 	}
 
-	expr := CompiledMatchExpression{regexp, &me}
+	tag := GetDB().GetTagById(me.TagId)
+
+	expr := CompiledMatchExpression{regexp, &me, &tag}
 	return &expr, nil
 }
 
@@ -100,31 +97,39 @@ func EventRecordFilterUnmatched(in <-chan EventRecord) <-chan EventRecord {
 }
 
 func GetTotalsByTag(in <-chan EventRecord) []TagTotal {
-	db := GetDB()
+	//db := GetDB()
 	out := []TagTotal{}
 	matchers := GetExpressions() // Get all expression matchers
-	totals := make(map[string]float64)
+	tagTotals := make(map[int]float64)
+	tagNames := GetDB().GetTagNames()
 
 	for event := range in {
 		for _, matcher := range *matchers {
+			match := false
+
 			if matcher.Expr.MatchString(event.Title) {
 				// the event matches the current expression, then the
 				// event's time must be added to the tally under the
 				// matcher's assigned tags
+				match = true
 
-				tags := db.GetTagsForMatcher(matcher.Source.Id)
-				for _, tag := range tags {
-					fmt.Printf("adding %f to %s\n", event.Duration, tag.Name)
-					totals[tag.Name] += event.Duration
-				}
+				tagTotals[matcher.Source.TagId] += event.Duration
+				//tags := db.GetTagsForMatcher(matcher.Source.Id)
+				//for _, tag := range tags {
+				//totals[tag.Name] += event.Duration
+				//}
+			}
+
+			if !match {
+				tagTotals[-1] += event.Duration
 			}
 		}
 	}
 
-	for tagName, duration := range totals {
+	for tagId, duration := range tagTotals {
 		out = append(out, TagTotal{
-			0,
-			tagName,
+			tagId,
+			tagNames[tagId],
 			duration,
 		})
 	}
