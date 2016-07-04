@@ -1,7 +1,6 @@
 package main
 
 import (
-	"app/database"
 	"fmt"
 	"regexp"
 	"sync"
@@ -9,7 +8,7 @@ import (
 
 type CompiledMatchExpression struct {
 	Expr   *regexp.Regexp
-	Source *database.MatchExpression
+	Source *MatchExpression
 }
 
 type TagTotal struct {
@@ -22,7 +21,7 @@ var compiled_expressions_mutex = &sync.Mutex{}
 
 var compiled_expressions *[]CompiledMatchExpression
 
-func NewCompiledMatchExpression(me database.MatchExpression) (*CompiledMatchExpression, error) {
+func NewCompiledMatchExpression(me MatchExpression) (*CompiledMatchExpression, error) {
 	regexp, err := regexp.Compile(me.Expression)
 
 	if err != nil {
@@ -35,7 +34,7 @@ func NewCompiledMatchExpression(me database.MatchExpression) (*CompiledMatchExpr
 
 func ReloadExpressions() int {
 	count := 0
-	db := database.GetDB()
+	db := GetDB()
 
 	compiled_exprs := make([]CompiledMatchExpression, 0)
 
@@ -60,7 +59,7 @@ func GetExpressions() *[]CompiledMatchExpression {
 	return compiled_expressions
 }
 
-func AppendExpression(expr *database.MatchExpression) {
+func AppendExpression(expr *MatchExpression) {
 	compiled_expr, err := NewCompiledMatchExpression(*expr)
 	if err != nil {
 		panic(err)
@@ -69,7 +68,7 @@ func AppendExpression(expr *database.MatchExpression) {
 	*compiled_expressions = append(*compiled_expressions, *compiled_expr)
 }
 
-func EventRecordFilterUnmatched(in <-chan database.EventRecord) <-chan database.EventRecord {
+func EventRecordFilterUnmatched(in <-chan EventRecord) <-chan EventRecord {
 	expressions := GetExpressions()
 
 	// nothing to filter against, so all inputs pass
@@ -78,7 +77,7 @@ func EventRecordFilterUnmatched(in <-chan database.EventRecord) <-chan database.
 		return in
 	}
 
-	out := make(chan database.EventRecord)
+	out := make(chan EventRecord)
 
 	go func() {
 		for event := range in {
@@ -100,8 +99,8 @@ func EventRecordFilterUnmatched(in <-chan database.EventRecord) <-chan database.
 	return out
 }
 
-func GetTotalsByTag(in <-chan database.EventRecord) []TagTotal {
-	db := database.GetDB()
+func GetTotalsByTag(in <-chan EventRecord) []TagTotal {
+	db := GetDB()
 	out := []TagTotal{}
 	matchers := GetExpressions() // Get all expression matchers
 	totals := make(map[string]float64)

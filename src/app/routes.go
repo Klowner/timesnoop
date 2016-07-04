@@ -1,7 +1,6 @@
 package main
 
 import (
-	"app/database"
 	"encoding/json"
 	"strconv"
 	//"github.com/elazarl/go-bindata-assetfs"
@@ -16,9 +15,7 @@ type M2TParams struct {
 	TId int64 `json:"tagId"`
 }
 
-var db *database.Database
-
-func routes(_db *database.Database) {
+func routes(_db *Database) {
 	db = _db
 
 	r := mux.NewRouter()
@@ -62,10 +59,10 @@ func totalsForDayHandler(wr http.ResponseWriter, req *http.Request) {
 func totalsUnmatchedHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	events_all := database.GetDB().EventsAllChannel()
+	events_all := GetDB().EventsAllChannel()
 	events_filtered := EventRecordFilterUnmatched(events_all)
 
-	out := make([]database.EventRecord, 0)
+	out := make([]EventRecord, 0)
 	for record := range events_filtered {
 		out = append(out, record)
 	}
@@ -77,19 +74,19 @@ func totalsUnmatchedHandler(w http.ResponseWriter, r *http.Request) {
 func TagIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	j, _ := json.Marshal(database.GetDB().GetTags())
+	j, _ := json.Marshal(GetDB().GetTags())
 	w.Write(j)
 }
 
 func TagCreate(w http.ResponseWriter, r *http.Request) {
-	tag := new(database.Tag)
+	tag := new(Tag)
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&tag)
 	if err != nil {
 		panic(err)
 	}
 
-	j, _ := json.Marshal(database.GetDB().CreateTag(tag))
+	j, _ := json.Marshal(GetDB().CreateTag(tag))
 	w.Write(j)
 }
 
@@ -97,7 +94,7 @@ func TagGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func MatcherCreate(w http.ResponseWriter, r *http.Request) {
-	matcher := new(database.MatchExpression)
+	matcher := new(MatchExpression)
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&matcher)
 
@@ -107,13 +104,13 @@ func MatcherCreate(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	j, _ := json.Marshal(database.GetDB().CreateMatchExpression(matcher))
+	j, _ := json.Marshal(GetDB().CreateMatchExpression(matcher))
 	w.Write(j)
 }
 
 func MatcherIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	j, _ := json.Marshal(database.GetDB().GetMatchExpressions())
+	j, _ := json.Marshal(GetDB().GetMatchExpressions())
 	w.Write(j)
 }
 
@@ -124,7 +121,7 @@ func MatcherGet(w http.ResponseWriter, r *http.Request) {
 func MatcherDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
-	database.GetDB().DeleteMatchExpressionById(id)
+	GetDB().DeleteMatchExpressionById(id)
 
 	ReloadExpressions()
 }
@@ -141,16 +138,16 @@ func parseM2TParams(r *http.Request) *M2TParams {
 
 func Matcher2TagCreate(w http.ResponseWriter, r *http.Request) {
 	params := parseM2TParams(r)
-	database.GetDB().M2TCreate(params.MId, params.TId)
+	GetDB().M2TCreate(params.MId, params.TId)
 }
 
 func Matcher2TagDelete(w http.ResponseWriter, r *http.Request) {
 	params := parseM2TParams(r)
-	database.GetDB().M2TDestroy(params.MId, params.TId)
+	GetDB().M2TDestroy(params.MId, params.TId)
 }
 
 func totalsByTagHandler(w http.ResponseWriter, r *http.Request) {
-	events_all := database.GetDB().EventsAllChannel()
+	events_all := GetDB().EventsAllChannel()
 	totals := GetTotalsByTag(events_all)
 
 	w.Header().Set("Content-Type", "application/json")

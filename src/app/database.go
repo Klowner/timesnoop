@@ -1,8 +1,9 @@
-package database
+package main
 
 import (
 	"app/xdotool"
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -25,6 +26,7 @@ func GetDB() *Database {
 }
 
 func (d *Database) Open() bool {
+	fmt.Printf("OPENING DATABASE!\n\n\n")
 	db, err := sql.Open("sqlite3", "./timesnoop.dat")
 	checkErr(err)
 
@@ -40,7 +42,7 @@ func (d *Database) RecordEvent(event xdotool.FocusEvent) {
 	checkErr(err)
 }
 
-func Initialize(events <-chan xdotool.FocusEvent) *Database {
+func DatabaseInitialize(events <-chan xdotool.FocusEvent) *Database {
 	database := GetDB()
 
 	go func() {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"app/database"
 	"app/xdotool"
 )
 
@@ -10,7 +9,7 @@ func main() {
 
 	events, eventsQuit := xdotool.StartTracking()
 
-	db := database.Initialize(events)
+	db := DatabaseInitialize(events)
 	routes(db)
 
 	switch {
