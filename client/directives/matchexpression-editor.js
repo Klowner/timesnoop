@@ -1,30 +1,6 @@
+var _ = require('lodash');
+
 module.exports = function (app) {
-
-	app.directive('matchTagsWidget', function () {
-		return {
-			restrict: 'EA',
-			scope: {
-				matcher: '='
-			},
-			template: require('../templates/directives/matchtagswidget.html'),
-			controller: function ($scope, $element, Tag, Matchers2Tags) {
-
-
-				$scope.enableTagMenu = function () {
-					$scope.availableTags = Tag.query();
-				};
-
-				$scope.addTag = function (tag) {
-					Matchers2Tags
-						.link($scope.matcher.id, tag.id)
-						.then(function () {
-							$scope.availableTags = [];
-						});
-				};
-			}
-		};
-	});
-
 	app.directive('matchExpressionEditor', function () {
 		return {
 			restrict: 'EA',
@@ -33,10 +9,11 @@ module.exports = function (app) {
 			},
 			template: require('../templates/directives/matchexpression-editor.html'),
 			replace: false,
-			controller: function ($scope, $element) {
+			controller: function ($scope, $element, Tag) {
 
 
 				$scope.matcher = {}; // for appending new records
+				$scope.tags = Tag.query();
 
 				$scope.deleteMatcher = function (matcher) {
 					matcher.$delete().then(function () {

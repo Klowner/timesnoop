@@ -1,4 +1,4 @@
-<table>
+<table class="fullsize-editor">
 	<thead>
 		<tr>
 			<th>Description</th>
@@ -11,7 +11,7 @@
 			<td>{{ matcher.description }}</td>
 			<td>{{ matcher.expression }}</td>
 			<td>
-				<match-tags-widget matcher="matcher"/>
+				<match-tags-widget matcher="matcher" tags="tags"/>
 			</td>
 			<td>
 				<input type="button" ng-click="deleteMatcher(matcher)" value="delete"/>

@@ -74,7 +74,17 @@ form {
 }
 
 .tag {
-  border: 1px solid #fff;
+  border-radius: 2px;
+  padding: 4pt;
+  color: #fff;
+  text-shadow: rgba(0, 0, 0, 0.5) 0px 1px 0px;
+  font-size: 8pt;
+  font-weight: bold;
+  background-color: #333;
+  margin: 1pt;
+
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 0px;
+  display: inline-block;
 }
 
 .tag-chooser {
@@ -82,6 +92,12 @@ form {
   padding: 0;
   list-style: none;
   position: relative;
+  & > li {
+    display: inline-block;
+    &.tag {
+      cursor: not-allowed;
+    }
+  }
 
   .tag-menu {
     padding: 0;
@@ -91,6 +107,7 @@ form {
     list-style: none;
     max-height: 10em;
     overflow-y: auto;
+    z-index: 10;
 
     & > li {
       margin: 0;
@@ -103,4 +120,38 @@ form {
       width: 100%;
     }
   }
+}
+
+.fullsize-editor {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    border-bottom: 1px solid #ccc;
+  }
+
+  th {
+    color: #000;
+    padding: 1em 0;
+  }
+
+  tbody td {
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 3pt;
+  }
+
+  input[type="text"] {
+    width: 100%;
+  }
+}
+
+input.button {
+  font-size: 9pt;
+  color: #555;
+  text-shadow: #fff 0 1px;
+  border: 1px solid #aaa;
+  background-color: #efefef;
+  border-radius: 2pt;
+  box-shadow: rgba(0, 0, 0, 0.5) 0 1px;
 }

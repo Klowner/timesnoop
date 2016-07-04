@@ -1,5 +1,5 @@
 <ul class="tag-chooser">
-	<li class="tag" ng-repeat="tag in matcher.tags">{{ tag.name }}</li>
+	<li class="tag" ng-repeat="tag in getTags()" ng-style="{'background-color': tag.color}" ng-click="removeTag(tag)">{{ tag.name }}</li>
 	<li class="add">
 		<input type="button" ng-click="enableTagMenu()" value="add"/>
 		<ul class="tag-menu">
