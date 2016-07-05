@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	//"fmt"
-	"github.com/elazarl/go-bindata-assetfs"
+	//"github.com/elazarl/go-bindata-assetfs"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -29,9 +29,9 @@ func routes(_db *Database) {
 	r.HandleFunc("/matchers/{id}", MatcherDelete).Methods("DELETE")
 	r.HandleFunc("/matchers", MatcherCreate).Methods("POST")
 
-	//r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
-	r.PathPrefix("/").Handler(http.FileServer(
-		&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "static"}))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+	//r.PathPrefix("/").Handler(http.FileServer(
+	//&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "static"}))
 
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe("0.0.0.0:8228", nil))
