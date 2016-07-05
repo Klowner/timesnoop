@@ -10,11 +10,6 @@ import (
 	"time"
 )
 
-type M2TParams struct {
-	MId int64 `json:"mId"`
-	TId int64 `json:"tagId"`
-}
-
 func routes(_db *Database) {
 	db = _db
 
@@ -31,9 +26,6 @@ func routes(_db *Database) {
 	r.HandleFunc("/matchers/{id}", MatcherGet).Methods("GET", "POST")
 	r.HandleFunc("/matchers/{id}", MatcherDelete).Methods("DELETE")
 	r.HandleFunc("/matchers", MatcherCreate).Methods("POST")
-
-	r.HandleFunc("/me2tags", Matcher2TagCreate).Methods("POST")
-	r.HandleFunc("/me2tags", Matcher2TagDelete).Methods("DELETE")
 
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	//r.PathPrefix("/").Handler(http.FileServer(
@@ -133,29 +125,10 @@ func MatcherDelete(w http.ResponseWriter, r *http.Request) {
 	ReloadExpressions()
 }
 
-func parseM2TParams(r *http.Request) *M2TParams {
-	decoder := json.NewDecoder(r.Body)
-	var params M2TParams
-	err := decoder.Decode(&params)
-	if err != nil {
-		panic(err)
-	}
-	return &params
-}
-
-func Matcher2TagCreate(w http.ResponseWriter, r *http.Request) {
-	params := parseM2TParams(r)
-	GetDB().M2TCreate(params.MId, params.TId)
-}
-
-func Matcher2TagDelete(w http.ResponseWriter, r *http.Request) {
-	params := parseM2TParams(r)
-	GetDB().M2TDestroy(params.MId, params.TId)
-}
-
 func totalsByTagHandler(w http.ResponseWriter, r *http.Request) {
 	events_all := GetDB().EventsAllChannel()
-	totals := GetTotalsByTag(events_all)
+	matchers := GetMatchers()
+	totals := GetTotalsByTag(events_all, matchers, true)
 
 	w.Header().Set("Content-Type", "application/json")
 	j, _ := json.Marshal(totals)

@@ -93,25 +93,6 @@ func (d *Database) GetTagNames() map[int]string {
 	return records
 }
 
-//func (d *Database) GetTagsForMatcher(matcherId int) []Tag {
-//rows, err := d.connection.Query(`
-//WITH j AS (SELECT tag_id FROM me2tags WHERE me_id=?)
-//SELECT id, parent_id, name, color
-//FROM tags
-//WHERE tags.id IN j
-//`, matcherId)
-
-//if err != nil {
-//panic(err)
-//}
-
-//records := []Tag{}
-//for rows.Next() {
-//records = append(records, *queryResultToTag(rows))
-//}
-//return records
-//}
-
 func (d *Database) CreateTag(tag *Tag) *Tag {
 	d.WriteLock()
 	_, err := d.connection.Exec("INSERT INTO tags (parent_id, name, color) VALUES (?, ?, ?)",
@@ -176,14 +157,6 @@ func queryResultToTag(rows *sql.Rows) *Tag {
 }
 
 func (d *Database) GetMatchExpressions() []MatchExpression {
-	//rows, err := d.connection.Query(`
-	//WITH c AS (SELECT id, description, expression FROM match_expressions)
-	//SELECT id, description, expression, (
-	//SELECT group_concat(tag_id) FROM me2tags WHERE me_id = c.id
-	//) FROM c
-	//ORDER BY description
-	//`)
-
 	rows, err := d.connection.Query(`
 		SELECT id, tag_id, description, expression FROM matchers
 		ORDER BY tag_id
@@ -203,14 +176,13 @@ func (d *Database) GetMatchExpressions() []MatchExpression {
 			&record.Expression,
 		)
 
-		//record.TagIds = processTagIds(tag_ids)
-
 		if err != nil {
 			panic(err)
 		}
 
 		results = append(results, record)
 	}
+
 	return results
 }
 
@@ -227,26 +199,6 @@ func (d *Database) DeleteMatchExpressionById(id int64) {
 func (d *Database) DeleteTagById(id int64) {
 	d.WriteLock()
 	_, err := d.connection.Exec("DELETE FROM tags WHERE id = ?", id)
-	d.WriteUnlock()
-
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (d *Database) M2TCreate(mId int64, tId int64) {
-	d.WriteLock()
-	_, err := d.connection.Exec("INSERT OR REPLACE INTO me2tags (me_id, tag_id) VALUES (?, ?)", mId, tId)
-	d.WriteUnlock()
-
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (d *Database) M2TDestroy(mId int64, tId int64) {
-	d.WriteLock()
-	_, err := d.connection.Exec("DELETE FROM me2tags WHERE me_id = ? AND tag_id = ?", mId, tId)
 	d.WriteUnlock()
 
 	if err != nil {

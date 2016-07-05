@@ -49,7 +49,7 @@ func ReloadExpressions() int {
 	return count
 }
 
-func GetExpressions() *[]CompiledMatchExpression {
+func GetMatchers() *[]CompiledMatchExpression {
 	if compiled_expressions == nil {
 		ReloadExpressions()
 	}
@@ -66,7 +66,7 @@ func AppendExpression(expr *MatchExpression) {
 }
 
 func EventRecordFilterUnmatched(in <-chan EventRecord) <-chan EventRecord {
-	expressions := GetExpressions()
+	expressions := GetMatchers()
 
 	// nothing to filter against, so all inputs pass
 	if len(*expressions) == 0 {
@@ -96,9 +96,8 @@ func EventRecordFilterUnmatched(in <-chan EventRecord) <-chan EventRecord {
 	return out
 }
 
-func GetTotalsByTag(in <-chan EventRecord) []TagTotal {
+func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, incl_untracked bool) []TagTotal {
 	out := []TagTotal{}
-	matchers := GetExpressions() // Get all expression matchers
 	tagTotals := make(map[int]float64)
 	tagNames := GetDB().GetTagNames()
 
@@ -112,7 +111,7 @@ func GetTotalsByTag(in <-chan EventRecord) []TagTotal {
 				tagTotals[matcher.Source.TagId] += event.Duration
 			}
 
-			if !match {
+			if !match && incl_untracked {
 				tagTotals[-1] += event.Duration
 			}
 		}
