@@ -11,25 +11,25 @@ module.exports = function (app) {
 			})
 
 			.state('stats', {
-				url: '/stats',
+				url: '/stats/:parentTagId',
 				template: require('../templates/stats.html'),
 				controller: 'StatsController'
 			})
 
 			.state('tags', {
-				url: '/tags',
+				url: '/tags/',
 				template: require('../templates/tags.html'),
 				controller: 'TagsController'
 			})
 
 			.state('matchers', {
-				url: '/matchers',
+				url: '/matchers/',
 				template: require('../templates/matchers.html'),
 				controller: 'MatchersController'
 			})
 
 			.state('categorize', {
-				url: '/categorize',
+				url: '/categorize/',
 				template: require('../templates/categorize.html'),
 				controller: 'CategorizeController'
 			})

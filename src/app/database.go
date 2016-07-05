@@ -39,7 +39,7 @@ func GetDB() *Database {
 
 func (d *Database) Open() bool {
 	fmt.Printf("opening database\n")
-	db, err := sql.Open("sqlite3", "./timesnoop.dat")
+	db, err := sql.Open("sqlite3", "./timesnoop.dat?cache=shared&mode=rwc")
 	checkErr(err)
 
 	_, err = db.Exec("PRAGMA foreign_keys = on")

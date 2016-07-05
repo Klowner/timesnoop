@@ -33,6 +33,7 @@ func (d *Database) GetTags() []Tag {
 	}
 
 	results := make([]Tag, 0)
+	defer rows.Close()
 	for rows.Next() {
 		var record Tag
 
@@ -56,12 +57,14 @@ func (d *Database) GetTagById(id int) Tag {
 		panic(err)
 	}
 	record := Tag{}
+	defer rows.Close()
 	rows.Next()
 	err = rows.Scan(
 		&record.Id,
 		&record.ParentId,
 		&record.Name,
 		&record.Color)
+
 	if err != nil {
 		panic(err)
 	}
@@ -75,6 +78,7 @@ func (d *Database) GetTagNames() map[int]string {
 	}
 	records := make(map[int]string)
 
+	defer rows.Close()
 	for rows.Next() {
 		var name string
 		var id int
@@ -84,6 +88,7 @@ func (d *Database) GetTagNames() map[int]string {
 		}
 		records[id] = name
 	}
+	records[-1] = "Uncategorized"
 
 	return records
 }

@@ -26,6 +26,10 @@ module.exports = function (app) {
 				$scope.addMatcher = function () {
 					console.log($scope.matcher);
 				};
+
+				$scope.getTag = function (id) {
+					return _.find($scope.tags, {id: id});
+				};
 			}
 		};
 	});

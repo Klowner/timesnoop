@@ -97,7 +97,6 @@ func EventRecordFilterUnmatched(in <-chan EventRecord) <-chan EventRecord {
 }
 
 func GetTotalsByTag(in <-chan EventRecord) []TagTotal {
-	//db := GetDB()
 	out := []TagTotal{}
 	matchers := GetExpressions() // Get all expression matchers
 	tagTotals := make(map[int]float64)
@@ -108,16 +107,9 @@ func GetTotalsByTag(in <-chan EventRecord) []TagTotal {
 			match := false
 
 			if matcher.Expr.MatchString(event.Title) {
-				// the event matches the current expression, then the
-				// event's time must be added to the tally under the
-				// matcher's assigned tags
 				match = true
 
 				tagTotals[matcher.Source.TagId] += event.Duration
-				//tags := db.GetTagsForMatcher(matcher.Source.Id)
-				//for _, tag := range tags {
-				//totals[tag.Name] += event.Duration
-				//}
 			}
 
 			if !match {

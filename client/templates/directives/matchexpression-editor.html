@@ -7,11 +7,10 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="matcher in matchers">
-			<td>{{ matcher.description }}</td>
+		<tr ng-repeat="matcher in matchers" ng-style="{'background-color': getTag(matcher.tag_id).color }">
+			<td>{{ matcher.description }} {{ getTag(matcher.tag_id).color }}</td>
 			<td>{{ matcher.expression }}</td>
 			<td>
-				<!--<match-tags-widget matcher="matcher" tags="tags"/>-->
 				<select
 					ng-options="tag.id as tag.name for tag in tags"
 					ng-model="matcher.tag_id"

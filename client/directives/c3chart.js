@@ -17,10 +17,9 @@ module.exports = function (app) {
 				template: '<div></div>',
 				replace: true,
 				controller: function ($scope, $element) {
+
 					// Wait until id is set before binding chart to this id
 					$scope.$watch($element, function () {
-						console.log('chart!');
-
 						if ('' === $element[0].id) {
 							return;
 						}
@@ -28,8 +27,6 @@ module.exports = function (app) {
 						$scope.config.bindto = '#' + $element[0].id;
 
 						$scope.$watch('config', function (newConfig, oldConfig) {
-							console.log('newconfig', newConfig);
-
 							if (!(newConfig.data.columns || newConfig.data.json || newConfig.data.rows)) {
 								return;
 							}

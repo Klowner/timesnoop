@@ -23,6 +23,7 @@ func (d *Database) TotalsForDay(day time.Time) []EventRecord {
 	}
 
 	results := make([]EventRecord, 0)
+	defer rows.Close()
 	for rows.Next() {
 		var record EventRecord
 		err := rows.Scan(&record.Title, &record.Duration)
@@ -44,6 +45,7 @@ func (d *Database) eventsQueryAsChannel(query string, params ...interface{}) <-c
 	out := make(chan EventRecord)
 
 	go func() {
+		defer rows.Close()
 		for rows.Next() {
 			rec := EventRecord{}
 			err := rows.Scan(
