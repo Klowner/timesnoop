@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"strconv"
-	//"github.com/elazarl/go-bindata-assetfs"
+	//"fmt"
+	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -17,6 +18,7 @@ func routes(_db *Database) {
 	r.HandleFunc("/stats/day/{date:[0-9]{4}-[0-9]{2}-[0-9]{1,2}}", totalsForDayHandler)
 	r.HandleFunc("/stats/unmatched", totalsUnmatchedHandler)
 	r.HandleFunc("/stats/tags", totalsByTagHandler)
+	r.HandleFunc("/stats/tags/{parentId}", totalsByTagHandler)
 	r.HandleFunc("/tags", TagIndex).Methods("GET")
 	r.HandleFunc("/tags/{name}", TagGet).Methods("GET", "POST")
 	r.HandleFunc("/tags", TagCreate).Methods("POST")
@@ -27,9 +29,10 @@ func routes(_db *Database) {
 	r.HandleFunc("/matchers/{id}", MatcherDelete).Methods("DELETE")
 	r.HandleFunc("/matchers", MatcherCreate).Methods("POST")
 
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
-	//r.PathPrefix("/").Handler(http.FileServer(
-	//&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "static"}))
+	//r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+	r.PathPrefix("/").Handler(http.FileServer(
+		&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "static"}))
+
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe("0.0.0.0:8228", nil))
 }
@@ -127,7 +130,18 @@ func MatcherDelete(w http.ResponseWriter, r *http.Request) {
 
 func totalsByTagHandler(w http.ResponseWriter, r *http.Request) {
 	events_all := GetDB().EventsAllChannel()
-	matchers := GetMatchers()
+
+	vars := mux.Vars(r)
+	parentId, _ := strconv.ParseInt(vars["parentId"], 10, 64)
+
+	var matchers *[]CompiledMatchExpression
+
+	if parentId > -1 {
+		matchers = GetMatchersWithParentId(int(parentId))
+	} else {
+		matchers = GetMatchers()
+	}
+
 	totals := GetTotalsByTag(events_all, matchers, true)
 
 	w.Header().Set("Content-Type", "application/json")

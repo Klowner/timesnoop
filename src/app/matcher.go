@@ -29,6 +29,18 @@ func NewCompiledMatchExpression(me MatchExpression) (*CompiledMatchExpression, e
 	return &expr, nil
 }
 
+func GetMatchersWithParentId(parent_tag_id int) *[]CompiledMatchExpression {
+	out := []CompiledMatchExpression{}
+
+	for _, matcher := range *GetMatchers() {
+		if matcher.Tag.ParentId == parent_tag_id {
+			out = append(out, matcher)
+		}
+	}
+
+	return &out
+}
+
 func ReloadExpressions() int {
 	count := 0
 	db := GetDB()
@@ -96,7 +108,7 @@ func EventRecordFilterUnmatched(in <-chan EventRecord) <-chan EventRecord {
 	return out
 }
 
-func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, incl_untracked bool) []TagTotal {
+func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, incl_unmatched bool) []TagTotal {
 	out := []TagTotal{}
 	tagTotals := make(map[int]float64)
 	tagNames := GetDB().GetTagNames()
@@ -111,7 +123,7 @@ func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, 
 				tagTotals[matcher.Source.TagId] += event.Duration
 			}
 
-			if !match && incl_untracked {
+			if !match && incl_unmatched {
 				tagTotals[-1] += event.Duration
 			}
 		}

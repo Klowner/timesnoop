@@ -30,7 +30,7 @@ module.exports = function (app) {
 			legend: { show: true }
 		};
 
-		Stats.getTagTotals().then(function (result) {
+		Stats.getTagTotals($stateParams.parentTagId).then(function (result) {
 			console.log(result);
 			$scope.tagsChart.data.columns = _.map(result.data, function (record) {
 				return [record.name, record.duration];

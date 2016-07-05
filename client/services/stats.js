@@ -9,9 +9,9 @@ module.exports = function (app) {
 		var url = '/stats';
 
 		return {
-			getTagTotals: function () {
+			getTagTotals: function (parentId) {
 				return $http({
-					url: url + '/tags',
+					url: url + '/tags' + (parentId ? '/' + parentId : ''),
 					method: 'GET'
 				});
 			}
