@@ -26,6 +26,13 @@ type TagTotal struct {
 	Duration float64 `json:"duration"`
 }
 
+type TagTotalTree struct {
+	TagId    int            `json:"id"`
+	Name     string         `json:"name"`
+	Duration float64        `json:"duration"`
+	Children []TagTotalTree `json:"children"`
+}
+
 func (d *Database) GetTags() []Tag {
 	rows, err := d.connection.Query("SELECT id, parent_id, name, color FROM tags ORDER BY name")
 	if err != nil {

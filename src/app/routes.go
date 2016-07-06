@@ -19,6 +19,8 @@ func routes(_db *Database) {
 	r.HandleFunc("/stats/unmatched", totalsUnmatchedHandler)
 	r.HandleFunc("/stats/tags", totalsByTagHandler)
 	r.HandleFunc("/stats/tags/{parentId}", totalsByTagHandler)
+	r.HandleFunc("/stats/tags/recursive", totalsByTagRecursiveHandler)
+
 	r.HandleFunc("/tags", TagIndex).Methods("GET")
 	r.HandleFunc("/tags/{name}", TagGet).Methods("GET", "POST")
 	r.HandleFunc("/tags", TagCreate).Methods("POST")
@@ -143,6 +145,19 @@ func totalsByTagHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	totals := GetTotalsByTag(events_all, matchers, true)
+
+	w.Header().Set("Content-Type", "application/json")
+	j, _ := json.Marshal(totals)
+	w.Write(j)
+}
+
+func totalsByTagRecursiveHandler(w http.ResponseWriter, r *http.Request) {
+	events_all := GetDB().EventsAllChannel()
+	var matchers *[]CompiledMatchExpression
+
+	matchers = GetMatchers()
+	totals := GetTotalsByTag(events_all, matchers, true)
+	tree := BuildTotalsTree(totals)
 
 	w.Header().Set("Content-Type", "application/json")
 	j, _ := json.Marshal(totals)

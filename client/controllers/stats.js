@@ -1,4 +1,5 @@
-var _ = require('lodash');
+var _ = require('lodash'),
+	d3 = require('d3');
 
 module.exports = function (app) {
 	app.controller('StatsController', function ($scope, $stateParams, $state, StatsService, Stats, Tag) {
@@ -40,32 +41,54 @@ module.exports = function (app) {
 			$scope.options = {
 				chart: {
 					type: 'sunburstChart',
-					height: 450
-				}
+					height: 700,
+					color: d3.scale.category20c(),
+					duration: 250,
+
+					sunburst: {
+						mode: 'size',
+						key: function (d) { return d.name; }
+					}
+				},
+
 			};
 
-			$scope.data = [{
-				name: "all",
-				children: [
-					{name: "one", size: 200 },
-					{name: "two",
-						children: [
-							{name: 'two sub', size: 200},
-							{name: 'twosub2', size: 200}
-						]
-					}
-				]
-			}];
+			$scope.data = [
+				{
+					name: 'root',
+					children: [
+						{
+							name: 'a',
+							children: [
+								{ name: "one", size: 10 },
+								{ name: "two", size: 20 },
+							]
+						},
+
+						{
+							name: 'b',
+							children: [
+								{ name: "b/one", size: 10 },
+								{ name: "b/two", size: 20 },
+							]
+						},
+					]
+				}
+			];
+
+				//name: "flare",
+				//children: [
+					//{
+						//name: "one",
+						//size: 128
+					//},
+					//{
+						//name: "two",
+						//size: 256
+					//}
+				//]
+			//}];
+
 		});
-
-		/*
-		StatsService.getData(function (data) {
-			$scope.collection = data;
-
-			$scope.chart.data.columns = _.map(_.take(data, 10), function (record) {
-				return [record.title, record.duration];
-			});
-			});
-		*/
 	});
 };
