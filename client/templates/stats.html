@@ -1,6 +1,7 @@
 <ul>
 	<c3-chart id="tags" config="tagsChart"></c3-chart>
 
+	<nvd3 options="options" data="data"></nvd3>
 	<li ng-repeat="record in collection">
 		{{ record.title }}
 		{{ record.duration | secondsToTime }}

@@ -14,6 +14,7 @@ module.exports = function (app) {
 		};
 		*/
 
+
 		$scope.tags = Tag.query();
 
 		$scope.tagsChart = {
@@ -35,6 +36,26 @@ module.exports = function (app) {
 			$scope.tagsChart.data.columns = _.map(result.data, function (record) {
 				return [record.name, record.duration];
 			});
+
+			$scope.options = {
+				chart: {
+					type: 'sunburstChart',
+					height: 450
+				}
+			};
+
+			$scope.data = [{
+				name: "all",
+				children: [
+					{name: "one", size: 200 },
+					{name: "two",
+						children: [
+							{name: 'two sub', size: 200},
+							{name: 'twosub2', size: 200}
+						]
+					}
+				]
+			}];
 		});
 
 		/*
