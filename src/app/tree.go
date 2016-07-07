@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -87,15 +88,43 @@ func BuildTagTotalsTree(tag_totals []TagTotal) []TreeNode {
 	}
 
 	flat_nodes := make([]TreeNode, len(tag_totals))
-	//flat_nodes := make([]TreeNode, len(tag_totals))
 
-	//tags := GetDB().GetTags()
+	tags_by_id := make(map[int]*Tag)
+	for _, tag := range GetDB().GetTags() {
+		tags_by_id[tag.Id] = &tag
+	}
 
 	//	tags := GetDB().GetTags()
 
 	for i, _ := range tag_totals {
 		flat_nodes[i].Value = &tag_totals[i]
+		fmt.Println(tag_totals[i])
 	}
+
+	type Node struct {
+		Id       int
+		Children []*Node
+	}
+
+	nodes := make([]Node, len(tag_totals))
+	for i, tag := range tag_totals {
+		nodes[i].Id = tag_totals[i].TagId
+		nodes[i].Children = make([]*Node, 0)
+
+		if nodes[i].Id > -1 {
+			fmt.Println(tag.ParentId)
+			//parent_tag := tags_by_id[tag.ParentTagId]
+			//_ = parent_tag
+			//fmt.Println("parent %d", parentid_to_index[parent_tag.Id])
+		}
+		//nodes[parentid_to_index[parent_tag.Id]].Children = append(nodes[parentid_to_index[parent_tag.Id]].Children, &nodes[i])
+	}
+
+	out, err := json.Marshal(nodes)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("nodes: " + string(out) + "\n\n")
 
 	//for i, _ := range tags {
 	//flat_nodes[i].Value = &tags[i]

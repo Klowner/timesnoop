@@ -21,10 +21,10 @@ type MatchExpression struct {
 }
 
 type TagTotal struct {
-	TagId       int     `json:"id"`
-	Name        string  `json:"name"`
-	ParentTagId int     `json:"parent_id"`
-	Duration    float64 `json:"duration"`
+	TagId    int     `json:"id"`
+	Name     string  `json:"name"`
+	ParentId int     `json:"parent_id"`
+	Duration float64 `json:"duration"`
 }
 
 //type TagTotalTree struct {
