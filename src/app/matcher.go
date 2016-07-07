@@ -129,13 +129,29 @@ func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, 
 		}
 	}
 
-	for tagId, duration := range tagTotals {
-		out = append(out, TagTotal{
-			tagId,
-			tagNames[tagId],
-			duration,
-		})
+	for id, name := range tagNames {
+
+		total := TagTotal{
+			TagId:    id,
+			Name:     name,
+			Duration: 0,
+		}
+
+		if val, ok := tagTotals[id]; ok {
+			total.Duration = val
+		}
+
+		out = append(out, total)
 	}
+	/*
+		for tagId, duration := range tagTotals {
+			out = append(out, TagTotal{
+				tagId,
+				tagNames[tagId],
+				duration,
+			})
+		}
+	*/
 
 	return out
 }

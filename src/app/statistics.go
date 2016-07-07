@@ -99,7 +99,3 @@ func (d *Database) EventsTotalsForDayChannel(day time.Time) <-chan EventRecord {
 func (d *Database) EventsTotalsForDay(day time.Time) []EventRecord {
 	return EventsChannelToSlice(d.EventsTotalsForDayChannel(day))
 }
-
-func BuildTotalsTree(totals *) TotalsTree {
-
-}

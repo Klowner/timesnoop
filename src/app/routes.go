@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	//"fmt"
+	"fmt"
 	//"github.com/elazarl/go-bindata-assetfs"
 	"github.com/gorilla/mux"
 	"log"
@@ -18,8 +18,8 @@ func routes(_db *Database) {
 	r.HandleFunc("/stats/day/{date:[0-9]{4}-[0-9]{2}-[0-9]{1,2}}", totalsForDayHandler)
 	r.HandleFunc("/stats/unmatched", totalsUnmatchedHandler)
 	r.HandleFunc("/stats/tags", totalsByTagHandler)
+	r.HandleFunc("/stats/tags/tree", totalsByTagTreeHandler)
 	r.HandleFunc("/stats/tags/{parentId}", totalsByTagHandler)
-	r.HandleFunc("/stats/tags/recursive", totalsByTagRecursiveHandler)
 
 	r.HandleFunc("/tags", TagIndex).Methods("GET")
 	r.HandleFunc("/tags/{name}", TagGet).Methods("GET", "POST")
@@ -151,15 +151,21 @@ func totalsByTagHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(j)
 }
 
-func totalsByTagRecursiveHandler(w http.ResponseWriter, r *http.Request) {
+func totalsByTagTreeHandler(w http.ResponseWriter, r *http.Request) {
 	events_all := GetDB().EventsAllChannel()
 	var matchers *[]CompiledMatchExpression
 
 	matchers = GetMatchers()
 	totals := GetTotalsByTag(events_all, matchers, true)
-	tree := BuildTotalsTree(totals)
+	//tree := BuildTagTotalsTree(totals)
+	//tree := TreeifyTagTotals(totals)
+	//for _, item := range tree {
+	//fmt.Printf("%s\n", item)
+	//}
+	tree := BuildTagTotalsTree(totals)
+	fmt.Printf("tree %s\n", tree)
 
 	w.Header().Set("Content-Type", "application/json")
-	j, _ := json.Marshal(totals)
+	j, _ := json.Marshal(tree)
 	w.Write(j)
 }

@@ -14,7 +14,16 @@ module.exports = function (app) {
 					url: url + '/tags' + (parentId ? '/' + parentId : ''),
 					method: 'GET'
 				});
+			},
+
+			getTagTotalsTree: function () {
+				return $http({
+					url: url + '/tags/tree',
+					method: 'GET'
+				});
 			}
+
+
 		};
 	});
 };
