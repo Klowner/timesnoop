@@ -6,8 +6,41 @@ import (
 )
 
 type TreeNode struct {
-	Children *[]TreeNode
+	Children []*TreeNode
+	Color    string
 	Value    *TagTotal
+}
+
+func (t *TreeNode) MarshalJSON() ([]byte, error) {
+	if len(t.Children) > 0 {
+		return json.Marshal(struct {
+			*TagTotal
+			Children []*TreeNode `json:"children"`
+		}{t.Value, t.Children})
+	} else {
+		return json.Marshal(t.Value)
+	}
+}
+
+func (t *TreeNode) ShiftDownDuration() {
+	for i, _ := range t.Children {
+		t.Children[i].ShiftDownDuration()
+	}
+
+	// If this node has a duration as well as children, then
+	// the duration needs to be moved to a new child node.
+	if len(t.Children) > 0 {
+		t.Children = append(t.Children, &TreeNode{
+			Children: nil,
+			Value: &TagTotal{
+				Name:     "Others",
+				TagId:    -1,
+				Duration: t.Value.Duration,
+			},
+		})
+		t.Value.Duration = 0
+		fmt.Printf("Add others to %s\n", t.Value.Name)
+	}
 }
 
 type TreeAssignmentRecord struct {
@@ -17,7 +50,8 @@ type TreeAssignmentRecord struct {
 }
 
 // returned TreeAssignments should be in order of the root parent id.
-
+// That means in order to find the parent, we only need to back-track
+// up the results until a record wither a lesser depth is found.
 func (d *Database) GetTreeAssignments() []TreeAssignmentRecord {
 	rows, err := d.connection.Query(`
 		WITH RECURSIVE rec(i, pid, id) AS (
@@ -25,7 +59,7 @@ func (d *Database) GetTreeAssignments() []TreeAssignmentRecord {
 			UNION ALL
 			SELECT rec.i+1, tags.id, tags.parent_id
 			FROM tags JOIN rec ON tags.parent_id=rec.pid
-			ORDER BY 1
+			ORDER BY 1 DESC
 			LIMIT -1 OFFSET 1
 		)
 		SELECT * FROM rec`)
@@ -57,84 +91,55 @@ func (d *Database) GetTreeAssignments() []TreeAssignmentRecord {
 	return results
 }
 
-/*
-func BuildTree(records []interface{}) []TreeNode {
-	tree_assignments := GetDB().GetTreeAssignments()
-	parentid_to_index := make(map[int]int)
-	result := make([]TreeNode, 0)
-	flat_nodes := make([]TreeNode, len(records))
+func BuildTagTotalsTree(tag_totals []TagTotal) *[]TreeNode {
+	tags := GetDB().GetTags()
 
-	// build index for mapping parent_id to subscript id
-	for i, assignment := range tree_assignments {
-		parentid_to_index[assignment.ParentId] = i
-		flat_nodes[i].Value
-	}
+	nodes := make([]TreeNode, len(tag_totals))
 
-	for _, record := range records {
-		record.Id
-	}
+	// tag_totals are in no particular order, but tags are
+	// sorted according to their parent.
+	// Simplest way to organize the totals seems to be building
+	// an index from tagid to the target index
+	tagid_to_index := make(map[int]int)
 
-	fmt.Printf("%s\n", flat_nodes)
-	return result
-}
-*/
+	root_node_count := 0
+	for i, tag := range tags {
+		tagid_to_index[tag.Id] = i
 
-func BuildTagTotalsTree(tag_totals []TagTotal) []TreeNode {
+		if tag.Depth > 0 {
+			parent_index := i - 1
+			for parent_index >= 0 && tags[parent_index].Depth >= tag.Depth {
+				parent_index--
+			}
 
-	// Build index for mapping parent_id to subscript id
-	parentid_to_index := make(map[int]int)
-	for i, assignment := range GetDB().GetTreeAssignments() {
-		parentid_to_index[assignment.ParentId] = i
-	}
+			nodes[parent_index].Children = append(nodes[parent_index].Children, &nodes[i])
 
-	flat_nodes := make([]TreeNode, len(tag_totals))
-
-	tags_by_id := make(map[int]*Tag)
-	for _, tag := range GetDB().GetTags() {
-		tags_by_id[tag.Id] = &tag
-	}
-
-	//	tags := GetDB().GetTags()
-
-	for i, _ := range tag_totals {
-		flat_nodes[i].Value = &tag_totals[i]
-		fmt.Println(tag_totals[i])
-	}
-
-	type Node struct {
-		Id       int
-		Children []*Node
-	}
-
-	nodes := make([]Node, len(tag_totals))
-	for i, tag := range tag_totals {
-		nodes[i].Id = tag_totals[i].TagId
-		nodes[i].Children = make([]*Node, 0)
-
-		if nodes[i].Id > -1 {
-			fmt.Println(tag.ParentId)
-			//parent_tag := tags_by_id[tag.ParentTagId]
-			//_ = parent_tag
-			//fmt.Println("parent %d", parentid_to_index[parent_tag.Id])
+		} else {
+			root_node_count++
 		}
-		//nodes[parentid_to_index[parent_tag.Id]].Children = append(nodes[parentid_to_index[parent_tag.Id]].Children, &nodes[i])
 	}
 
-	out, err := json.Marshal(nodes)
-	if err != nil {
-		panic(err)
+	// Link values up to nodes
+	for i, total := range tag_totals {
+		nodes[tagid_to_index[total.TagId]].Value = &tag_totals[i]
+		nodes[tagid_to_index[total.TagId]].Color = tags[tagid_to_index[total.TagId]].Color
 	}
-	fmt.Println("nodes: " + string(out) + "\n\n")
 
-	//for i, _ := range tags {
-	//flat_nodes[i].Value = &tags[i]
-	//}
+	j := 0
+	out := make([]TreeNode, root_node_count)
+	for _, tag := range tags {
+		if tag.Depth == 0 {
+			out[j] = nodes[tagid_to_index[tag.Id]]
+			j++
+		}
+	}
 
-	//// stitch up children into the appropriate parents
-	//for i, _ := range flat_nodes {
-	//target := &flat_nodes[i]
-	//_ = target
-	//}
+	return &out
+}
 
-	return flat_nodes
+func ShiftDownDurations(tree_nodes *[]TreeNode) *[]TreeNode {
+	for i, _ := range *tree_nodes {
+		(*tree_nodes)[i].ShiftDownDuration()
+	}
+	return tree_nodes
 }

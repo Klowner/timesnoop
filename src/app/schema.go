@@ -46,18 +46,6 @@ func (d *Database) CreateSchema() {
 		"CREATE INDEX IF NOT EXISTS matchers_expression_idx ON matchers(description)",
 		"CREATE INDEX IF NOT EXISTS matchers_tag_id_idx ON matchers(tag_id)",
 		"CREATE INDEX IF NOT EXISTS matchers_id_idx ON matchers(id)",
-
-		// Match expression <-> tag many-to-many table
-		//`CREATE TABLE IF NOT EXISTS me2tags(
-		//tag_id INTEGER,
-		//me_id INTEGER,
-		//FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE,
-		//FOREIGN KEY(me_id) REFERENCES matchers(id) ON DELETE CASCADE
-		//)`,
-
-		//"CREATE INDEX IF NOT EXISTS me2tags_tag_id_idx ON me2tags(tag_id)",
-		//"CREATE INDEX IF NOT EXISTS me2tags_me_id_idx ON me2tags(me_id)",
-		//"CREATE UNIQUE INDEX IF NOT EXISTS me2tags_unique_idx ON me2tags(tag_id, me_id)",
 	}
 
 	for _, statement := range statements {
@@ -83,5 +71,6 @@ func (d *Database) PrepareStatements() {
 
 	d.stmt_daily_summarize, err = d.connection.Prepare(`
 		`)
+
 	checkErr(err)
 }

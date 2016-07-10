@@ -162,10 +162,12 @@ func totalsByTagTreeHandler(w http.ResponseWriter, r *http.Request) {
 	//for _, item := range tree {
 	//fmt.Printf("%s\n", item)
 	//}
-	tree := BuildTagTotalsTree(totals)
-	fmt.Printf("tree %s\n", tree)
+	tree := ShiftDownDurations(BuildTagTotalsTree(totals))
+	//tree := BuildTagTotalsTree(totals)
+	//fmt.Printf("tree %s\n", totals)
 
 	w.Header().Set("Content-Type", "application/json")
-	j, _ := json.Marshal(tree)
+	j, _ := json.Marshal(*tree)
+	fmt.Println(tree)
 	w.Write(j)
 }

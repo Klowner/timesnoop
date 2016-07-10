@@ -11,6 +11,7 @@ type Tag struct {
 	Name     string `json:"name"`
 	ParentId int    `json:"parent_id"`
 	Color    string `json:"color"`
+	Depth    int    `json:"depth"`
 }
 
 type MatchExpression struct {
@@ -23,18 +24,52 @@ type MatchExpression struct {
 type TagTotal struct {
 	TagId    int     `json:"id"`
 	Name     string  `json:"name"`
-	ParentId int     `json:"parent_id"`
+	Color    string  `json:"color"`
 	Duration float64 `json:"duration"`
 }
 
-//type TagTotalTree struct {
-//TagId    int            `json:"id"`
-//Name     string         `json:"name"`
-//Duration float64        `json:"duration"`
-//Children []TagTotalTree `json:"children"`
-//}
-
+// Tags returned are sorted parent first
 func (d *Database) GetTags() []Tag {
+	rows, err := d.connection.Query(`
+		WITH RECURSIVE rec(id, parent_id, name, color, r_depth) AS (
+			VALUES (0, 0, null, null, -1)
+			UNION ALL
+			SELECT tags.id, tags.parent_id, tags.name, tags.color, rec.r_depth+1
+			FROM tags JOIN rec ON tags.parent_id=rec.id
+			ORDER BY 5 DESC
+			LIMIT -1 OFFSET 1
+		)
+		SELECT id, parent_id, name, color, r_depth FROM rec`)
+
+	if err != nil {
+		panic(err)
+	}
+
+	results := make([]Tag, 0)
+
+	defer rows.Close()
+	for rows.Next() {
+		var record Tag
+
+		err := rows.Scan(
+			&record.Id,
+			&record.ParentId,
+			&record.Name,
+			&record.Color,
+			&record.Depth,
+		)
+
+		if err != nil {
+			panic(err)
+		}
+
+		results = append(results, record)
+	}
+
+	return results
+}
+
+func (d *Database) GetTagsByName() []Tag {
 	rows, err := d.connection.Query("SELECT id, parent_id, name, color FROM tags ORDER BY name")
 	if err != nil {
 		panic(err)
@@ -56,6 +91,14 @@ func (d *Database) GetTags() []Tag {
 		}
 		results = append(results, record)
 	}
+
+	results = append(results, Tag{
+		Id:       -1,
+		ParentId: 0,
+		Name:     "Uncategorized",
+		Color:    "#ffffff",
+	})
+
 	return results
 }
 
@@ -84,6 +127,7 @@ func (d *Database) GetTagNames() map[int]string {
 	if err != nil {
 		panic(err)
 	}
+
 	records := make(map[int]string)
 
 	defer rows.Close()
@@ -96,6 +140,7 @@ func (d *Database) GetTagNames() map[int]string {
 		}
 		records[id] = name
 	}
+
 	records[-1] = "Uncategorized"
 
 	return records
