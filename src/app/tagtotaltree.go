@@ -7,7 +7,6 @@ import (
 
 type tagTotalTreeNode struct {
 	Children []*tagTotalTreeNode
-	Color    string
 	Value    *TagTotal
 }
 
@@ -74,7 +73,6 @@ func BuildTagTotalsTree(tag_totals []TagTotal) []tagTotalTreeNode {
 	// Link values up to nodes
 	for i, total := range tag_totals {
 		nodes[tagid_to_index[total.TagId]].Value = &tag_totals[i]
-		nodes[tagid_to_index[total.TagId]].Color = tags[tagid_to_index[total.TagId]].Color
 	}
 
 	j := 0

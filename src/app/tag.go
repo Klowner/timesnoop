@@ -145,6 +145,22 @@ func (d *Database) CreateTag(tag *Tag) *Tag {
 
 	return tag
 }
+
+func (d *Database) UpdateTag(tag *Tag) *Tag {
+	_, err := d.connection.Exec("UPDATE tags SET parent_id=?, name=?, color=? WHERE id = ?",
+		tag.ParentId,
+		tag.Name,
+		tag.Color,
+		tag.Id,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return tag
+}
+
 func (d *Database) DeleteTagById(id int64) {
 	d.WriteLock()
 	_, err := d.connection.Exec("DELETE FROM tags WHERE id = ?", id)

@@ -21,7 +21,9 @@ func routes(_db *Database) {
 	r.HandleFunc("/stats/tags/{parentId}", totalsByTagHandler)
 
 	r.HandleFunc("/tags", TagIndex).Methods("GET")
-	r.HandleFunc("/tags/{name}", TagGet).Methods("GET", "POST")
+	r.HandleFunc("/tags/tree", TagTreeHandler).Methods("GET")
+	r.HandleFunc("/tags/{name}", TagGet).Methods("GET")
+	r.HandleFunc("/tags/{name}", TagUpdate).Methods("POST")
 	r.HandleFunc("/tags", TagCreate).Methods("POST")
 	r.HandleFunc("/tags/{id}", tagDeleteHandler).Methods("DELETE")
 
@@ -88,6 +90,23 @@ func TagCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func TagGet(w http.ResponseWriter, r *http.Request) {
+}
+
+func TagUpdate(w http.ResponseWriter, r *http.Request) {
+	tag := new(Tag)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&tag)
+	if err != nil {
+		panic(err)
+	}
+
+	j, _ := json.Marshal(GetDB().UpdateTag(tag))
+
+	w.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		panic(err)
+	}
+	w.Write(j)
 }
 
 func tagDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -157,6 +176,14 @@ func totalsByTagTreeHandler(w http.ResponseWriter, r *http.Request) {
 	matchers = GetMatchers()
 	totals := GetTotalsByTag(events_all, matchers, true)
 	tree := ShiftDownDurations(BuildTagTotalsTree(totals))
+
+	w.Header().Set("Content-Type", "application/json")
+	j, _ := json.Marshal(tree)
+	w.Write(j)
+}
+
+func TagTreeHandler(w http.ResponseWriter, r *http.Request) {
+	tree := BuildTagTree()
 
 	w.Header().Set("Content-Type", "application/json")
 	j, _ := json.Marshal(tree)

@@ -160,3 +160,34 @@ path {
   stroke: #eee;
   fill-rule: evenodd;
 }
+
+.tag-inline-editor {
+  display: block;
+  padding: 0pt;
+  margin: 4pt;
+  border: 1px solid #444;
+}
+
+.angular-ui-tree-node {
+  position: relative;
+}
+
+.angular-ui-tree-empty {
+  min-height: 100px;
+  background-color: #ff0000;
+}
+.angular-ui-tree-nodes {
+}
+
+.angular-ui-tree-placeholder {
+  background: red;
+  display: block;
+}
+
+.tag-tree-handle {
+  padding: 1em;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #444;
+  display: inline-block;
+}

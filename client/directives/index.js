@@ -4,4 +4,5 @@ module.exports = function (app) {
 	require('./d3sunburst')(app);
 	require('./matchtagswidget')(app);
 	require('./tags-editor')(app);
+	require('./tag-inline-editor')(app);
 };

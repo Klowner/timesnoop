@@ -1,23 +1,17 @@
 
-<tags-editor tags="tags"></tags-editor>
+<!--<tags-editor tags="tags"></tags-editor>-->
 
-<form ng-submit="addTag()">
-	<div ng-include="'templates/forms/tag.html'" />
-</form>
-
-<div>
-	<div ng-repeat="tag in tags">{{ tag.name }}!</div>
-</div>
-
-<div ui-tree>
-	<ol ui-tree-nodes="" ng-model="tags">
-		<li ng-repeat="tag in tag" ui-tree-node>
-			<div ui-tree-handle>
-				{{ tag.name }}
-			</div>
-			<ol ui-tree-nodes="" ng-model="tag.children">
-
-			</ol>
+<script type="text/ng-template" id="nodes_renderer.html">
+	<div tag-inline-editor tag="tag"></div>
+	<ol ui-tree-nodes ng-model="tag.children">
+		<li ng-repeat="tag in tag.children" ui-tree-node ng-include="'nodes_renderer.html'">
 		</li>
 	</ol>
+</script>
+
+<div ui-tree="treeOptions" id="tree-root">
+	<ol ui-tree-nodes="" ng-model="tagtree.children" >
+		<li ng-repeat="tag in tagtree.children" ui-tree-node data-expand-on-hover ng-include="'nodes_renderer.html'"></li>
+	</ol>
 </div>
+
