@@ -8,3 +8,16 @@
 <div>
 	<div ng-repeat="tag in tags">{{ tag.name }}!</div>
 </div>
+
+<div ui-tree>
+	<ol ui-tree-nodes="" ng-model="tags">
+		<li ng-repeat="tag in tag" ui-tree-node>
+			<div ui-tree-handle>
+				{{ tag.name }}
+			</div>
+			<ol ui-tree-nodes="" ng-model="tag.children">
+
+			</ol>
+		</li>
+	</ol>
+</div>

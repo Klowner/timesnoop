@@ -6,6 +6,7 @@ var app = require('./app'),
 require('./style/main.scss');
 require('../node_modules/c3/c3.min.css');
 require('../node_modules/nvd3/build/nv.d3.min.css');
+require('../node_modules/angular-ui-tree/dist/angular-ui-tree.css');
 
 // Components
 require('./controllers')(app);

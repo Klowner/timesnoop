@@ -5,4 +5,5 @@ module.exports = angular.module('activityTracker', [
 	require('angular-resource'),
 	require('angular-ui-router'),
 	require('angular-nvd3'),
+	require('angular-ui-tree'),
 ]);

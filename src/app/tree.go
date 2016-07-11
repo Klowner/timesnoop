@@ -5,24 +5,24 @@ import (
 	"fmt"
 )
 
-type TreeNode struct {
-	Children []*TreeNode
+type TotalTreeNode struct {
+	Children []*TotalTreeNode
 	Color    string
 	Value    *TagTotal
 }
 
-func (t *TreeNode) MarshalJSON() ([]byte, error) {
+func (t *TotalTreeNode) MarshalJSON() ([]byte, error) {
 	if len(t.Children) > 0 {
 		return json.Marshal(struct {
 			*TagTotal
-			Children []*TreeNode `json:"children"`
+			Children []*TotalTreeNode `json:"children"`
 		}{t.Value, t.Children})
 	} else {
 		return json.Marshal(t.Value)
 	}
 }
 
-func (t *TreeNode) ShiftDownDuration() {
+func (t *TotalTreeNode) ShiftDownDuration() {
 	for i, _ := range t.Children {
 		t.Children[i].ShiftDownDuration()
 	}
@@ -30,7 +30,7 @@ func (t *TreeNode) ShiftDownDuration() {
 	// If this node has a duration as well as children, then
 	// the duration needs to be moved to a new child node.
 	if len(t.Children) > 0 {
-		t.Children = append(t.Children, &TreeNode{
+		t.Children = append(t.Children, &TotalTreeNode{
 			Children: nil,
 			Value: &TagTotal{
 				Name:     "Others",
@@ -38,63 +38,15 @@ func (t *TreeNode) ShiftDownDuration() {
 				Duration: t.Value.Duration,
 			},
 		})
+		fmt.Printf("Add others to %s %d\n", t.Value.Name, t.Value.Duration)
 		t.Value.Duration = 0
-		fmt.Printf("Add others to %s\n", t.Value.Name)
 	}
 }
 
-type TreeAssignmentRecord struct {
-	Id       int
-	ParentId int
-	Depth    int
-}
-
-// returned TreeAssignments should be in order of the root parent id.
-// That means in order to find the parent, we only need to back-track
-// up the results until a record wither a lesser depth is found.
-func (d *Database) GetTreeAssignments() []TreeAssignmentRecord {
-	rows, err := d.connection.Query(`
-		WITH RECURSIVE rec(i, pid, id) AS (
-			VALUES (-1, 0, 0)
-			UNION ALL
-			SELECT rec.i+1, tags.id, tags.parent_id
-			FROM tags JOIN rec ON tags.parent_id=rec.pid
-			ORDER BY 1 DESC
-			LIMIT -1 OFFSET 1
-		)
-		SELECT * FROM rec`)
-	if err != nil {
-		panic(err)
-	}
-
-	results := make([]TreeAssignmentRecord, 0)
-
-	defer rows.Close()
-	for rows.Next() {
-		var record TreeAssignmentRecord
-
-		err := rows.Scan(
-			&record.Depth,
-			&record.Id,
-			&record.ParentId,
-		)
-
-		if err != nil {
-			panic(err)
-		}
-
-		results = append(results, record)
-	}
-
-	fmt.Printf("%s\n", results)
-
-	return results
-}
-
-func BuildTagTotalsTree(tag_totals []TagTotal) *[]TreeNode {
+func BuildTagTotalsTree(tag_totals []TagTotal) []TotalTreeNode {
 	tags := GetDB().GetTags()
 
-	nodes := make([]TreeNode, len(tag_totals))
+	nodes := make([]TotalTreeNode, len(tag_totals))
 
 	// tag_totals are in no particular order, but tags are
 	// sorted according to their parent.
@@ -126,7 +78,7 @@ func BuildTagTotalsTree(tag_totals []TagTotal) *[]TreeNode {
 	}
 
 	j := 0
-	out := make([]TreeNode, root_node_count)
+	out := make([]TotalTreeNode, root_node_count)
 	for _, tag := range tags {
 		if tag.Depth == 0 {
 			out[j] = nodes[tagid_to_index[tag.Id]]
@@ -134,12 +86,12 @@ func BuildTagTotalsTree(tag_totals []TagTotal) *[]TreeNode {
 		}
 	}
 
-	return &out
+	return out
 }
 
-func ShiftDownDurations(tree_nodes *[]TreeNode) *[]TreeNode {
-	for i, _ := range *tree_nodes {
-		(*tree_nodes)[i].ShiftDownDuration()
+func ShiftDownDurations(tree_nodes []TotalTreeNode) []TotalTreeNode {
+	for i, _ := range tree_nodes {
+		tree_nodes[i].ShiftDownDuration()
 	}
 	return tree_nodes
 }
