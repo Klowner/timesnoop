@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	//"github.com/elazarl/go-bindata-assetfs"
 	"github.com/gorilla/mux"
 	"log"
@@ -161,6 +160,5 @@ func totalsByTagTreeHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	j, _ := json.Marshal(tree)
-	fmt.Println(tree)
 	w.Write(j)
 }

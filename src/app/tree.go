@@ -5,24 +5,24 @@ import (
 	"fmt"
 )
 
-type TotalTreeNode struct {
-	Children []*TotalTreeNode
+type tagTotalTreeNode struct {
+	Children []*tagTotalTreeNode
 	Color    string
 	Value    *TagTotal
 }
 
-func (t *TotalTreeNode) MarshalJSON() ([]byte, error) {
+func (t *tagTotalTreeNode) MarshalJSON() ([]byte, error) {
 	if len(t.Children) > 0 {
 		return json.Marshal(struct {
 			*TagTotal
-			Children []*TotalTreeNode `json:"children"`
+			Children []*tagTotalTreeNode `json:"children"`
 		}{t.Value, t.Children})
 	} else {
 		return json.Marshal(t.Value)
 	}
 }
 
-func (t *TotalTreeNode) ShiftDownDuration() {
+func (t *tagTotalTreeNode) ShiftDownDuration() {
 	for i, _ := range t.Children {
 		t.Children[i].ShiftDownDuration()
 	}
@@ -30,7 +30,7 @@ func (t *TotalTreeNode) ShiftDownDuration() {
 	// If this node has a duration as well as children, then
 	// the duration needs to be moved to a new child node.
 	if len(t.Children) > 0 {
-		t.Children = append(t.Children, &TotalTreeNode{
+		t.Children = append(t.Children, &tagTotalTreeNode{
 			Children: nil,
 			Value: &TagTotal{
 				Name:     "Others",
@@ -43,10 +43,10 @@ func (t *TotalTreeNode) ShiftDownDuration() {
 	}
 }
 
-func BuildTagTotalsTree(tag_totals []TagTotal) []TotalTreeNode {
+func BuildTagTotalsTree(tag_totals []TagTotal) []tagTotalTreeNode {
 	tags := GetDB().GetTags()
 
-	nodes := make([]TotalTreeNode, len(tag_totals))
+	nodes := make([]tagTotalTreeNode, len(tag_totals))
 
 	// tag_totals are in no particular order, but tags are
 	// sorted according to their parent.
@@ -78,7 +78,7 @@ func BuildTagTotalsTree(tag_totals []TagTotal) []TotalTreeNode {
 	}
 
 	j := 0
-	out := make([]TotalTreeNode, root_node_count)
+	out := make([]tagTotalTreeNode, root_node_count)
 	for _, tag := range tags {
 		if tag.Depth == 0 {
 			out[j] = nodes[tagid_to_index[tag.Id]]
@@ -89,7 +89,7 @@ func BuildTagTotalsTree(tag_totals []TagTotal) []TotalTreeNode {
 	return out
 }
 
-func ShiftDownDurations(tree_nodes []TotalTreeNode) []TotalTreeNode {
+func ShiftDownDurations(tree_nodes []tagTotalTreeNode) []tagTotalTreeNode {
 	for i, _ := range tree_nodes {
 		tree_nodes[i].ShiftDownDuration()
 	}
