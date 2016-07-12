@@ -24,7 +24,7 @@ func (t *tagTreeNode) MarshalJSON() ([]byte, error) {
 }
 
 func BuildTagTree() []tagTreeNode {
-	tags := GetDB().GetTags()
+	tags := GetDB().GetTags(false)
 	tagIdToIndex := make(map[int]int)
 
 	nodes := make([]tagTreeNode, len(tags))

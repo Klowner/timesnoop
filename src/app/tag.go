@@ -13,7 +13,7 @@ type Tag struct {
 }
 
 // Tags returned are sorted parent first
-func (d *Database) GetTags() []Tag {
+func (d *Database) GetTags(includeUnmatched bool) []Tag {
 	rows, err := d.connection.Query(`
 		WITH RECURSIVE rec(id, parent_id, name, color, r_depth) AS (
 			VALUES (0, 0, null, null, -1)
@@ -48,6 +48,16 @@ func (d *Database) GetTags() []Tag {
 		}
 
 		results = append(results, record)
+	}
+
+	if includeUnmatched == true {
+		results = append(results, Tag{
+			Id:       -1,
+			ParentId: 0,
+			Name:     "Uncategorized",
+			Color:    "#999999",
+			Depth:    0,
+		})
 	}
 
 	return results

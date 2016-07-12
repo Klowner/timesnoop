@@ -15,7 +15,7 @@ module.exports = function (app) {
 				}
 
 				function save() {
-					new $scope.tag.$save();
+					$scope.tag.$save();
 				}
 
 				function debouncedSave(newValue, oldValue) {

@@ -42,8 +42,16 @@ func (t *tagTotalTreeNode) ShiftDownDuration() {
 	}
 }
 
+func (t *tagTotalTreeNode) TotalUpDurations() float64 {
+	for i, _ := range t.Children {
+		t.Value.Duration += t.Children[i].TotalUpDurations()
+	}
+
+	return t.Value.Duration
+}
+
 func BuildTagTotalsTree(tag_totals []TagTotal) []tagTotalTreeNode {
-	tags := GetDB().GetTags()
+	tags := GetDB().GetTags(false)
 
 	nodes := make([]tagTotalTreeNode, len(tag_totals))
 
@@ -90,6 +98,14 @@ func BuildTagTotalsTree(tag_totals []TagTotal) []tagTotalTreeNode {
 func ShiftDownDurations(tree_nodes []tagTotalTreeNode) []tagTotalTreeNode {
 	for i, _ := range tree_nodes {
 		tree_nodes[i].ShiftDownDuration()
+	}
+	return tree_nodes
+}
+
+func TotalUpDurations(tree_nodes []tagTotalTreeNode) []tagTotalTreeNode {
+	sum := 0.0
+	for i, _ := range tree_nodes {
+		sum += tree_nodes[i].TotalUpDurations()
 	}
 	return tree_nodes
 }

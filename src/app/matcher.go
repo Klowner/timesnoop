@@ -108,7 +108,7 @@ func EventRecordFilterUnmatched(in <-chan EventRecord) <-chan EventRecord {
 	return out
 }
 
-func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, incl_unmatched bool) []TagTotal {
+func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, includeUnmatched bool) []TagTotal {
 	out := []TagTotal{}
 	tagTotals := make(map[int]float64)
 	//tagNames := GetDB().GetTagNames()
@@ -123,14 +123,13 @@ func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, 
 				tagTotals[matcher.Source.TagId] += event.Duration
 			}
 
-			if !match && incl_unmatched {
-				tagTotals[0] += event.Duration
+			if !match && includeUnmatched {
+				tagTotals[-1] += event.Duration
 			}
 		}
 	}
 
-	fmt.Println("...................")
-	for _, tag := range GetDB().GetTags() {
+	for _, tag := range GetDB().GetTags(includeUnmatched) {
 		total := TagTotal{
 			TagId:    tag.Id,
 			Name:     tag.Name,
@@ -145,6 +144,14 @@ func GetTotalsByTag(in <-chan EventRecord, matchers *[]CompiledMatchExpression, 
 		out = append(out, total)
 	}
 
+	//if incl_unmatched {
+	//out = append(out, TagTotal{
+	//TagId:    -1,
+	//Name:     "Uncategorized",
+	//Duration: tagTotals[-1],
+	//Color:    "#444444",
+	//})
+	//}
 	/*
 		for id, name := range GetDB().GetTagNames() {
 

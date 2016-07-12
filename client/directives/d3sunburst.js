@@ -9,84 +9,107 @@ module.exports = function (app) {
 				options: '=',
 				data: '='
 			},
-			link: function (scope, element, attrs) {
-				var width = 960,
-					height = 700,
-					radius = Math.min(width, height) / 2 - 10;
+			link: function (scope, el, attrs) {
+				var w, h,
+					vis = d3.select(el[0]).append('svg'),
+					sunburst = vis.append('g').attr('class', 'sunburst'),
+					radius = 100,
+					x = d3.scale.linear().range([0, 2*Math.PI]),
+					y = d3.scale.linear().range([0, radius]),
+					colors = d3.scale.category20c(),
+					color = function (d) {
+							return d.color || (d.parent && d.parent.color) || '#ffffff';
+						},
+					partition = d3.layout.partition()
+						.sort(null)
+						.value(function (d) { return 1; }),
 
-				var vis = d3.select(element[0]).append('svg')
-					.attr('width', width)
-					.attr('height', height)
-					.append('g')
-					.attr('transform', 'translate(' + width / 2 + ',' + (height/2+10) + ')'),
+					arc = d3.svg.arc()
+						.startAngle(function (d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x))); })
+						.endAngle(function (d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))); })
+						.innerRadius(function (d) { return Math.max(0, y(d.y)); })
+						.outerRadius(function (d) { return Math.max(0, y(d.y + d.dy)); }),
 
-				colors = d3.scale.category20c(),
-				color = function (d) {
-					console.log(d.color);
-					return d.color || (d.parent && d.parent.color) || '#ffffff';
-				},
+					tip = d3tip()
+						.attr('class', 'd3-tip')
+						.offset(function () {
+							console.log(this);
+							return [0, 0];
+						})
+						.direction('s')
+						.html(function (d) {
+							return d.name + ' ' + (d.duration / 60).toFixed(2) + 'hrs';
+						}),
 
+					sunburstPath,
+					node;
 
-				partition = d3.layout.partition()
-					.sort(null)
-					.value(function (d) { return 1; }),
-
-				x = d3.scale.linear().range([0, 2 * Math.PI]),
-				y = d3.scale.linear().range([0, radius]),
-
-				arc = d3.svg.arc()
-					.startAngle(function (d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x))); })
-					.endAngle(function (d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))); })
-					.innerRadius(function (d) { return Math.max(0, y(d.y)); })
-					.outerRadius(function (d) { return Math.max(0, y(d.y + d.dy)); }),
-
-				tip = d3tip()
-					.offset([-10, 0])
-					.html(function (d) {
-						return d.name + ' ' + d.duration;
-					}),
-
-				node;
 
 				vis.call(tip);
 
-				scope.$watch('data', function (newData, oldData) {
-					if (!newData) {
-						return;
-					}
+				el = el[0];
 
-					node = newData;
+				angular.element(el).addClass('d3-sunburst');
 
+				scope.$watch(function () {
+					w = el.clientWidth;
+					h = el.clientHeight;
+					return w + h;
+				}, resize);
 
-					var path = vis.datum(newData).selectAll('path')
+				function resize() {
+					radius = Math.min(w, h) / 2 - 5;
+					vis.attr({width: w, height: h});
+					y.range([0, radius]);
+					sunburst.attr('transform', 'translate(' + (w / 2) + ',' + (h / 2 + 5) + ')');
+					update();
+					rescale();
+				}
+
+				scope.$watch('data', update);
+
+				function update() {
+					if (!scope.data) { return; }
+
+					sunburst.selectAll('*').remove();
+
+					var path = sunburst.datum(scope.data).selectAll('path')
 						.data(partition.value(function (d) { return d.duration; }).nodes)
 						.enter().append('path')
 						.attr('d', arc)
-						.style('fill', color) //function (d) { return color((d.children ? d : d.parent).name); })
+						.style('fill', color)
 						.on('click', click)
 						.on('mouseover', tip.show)
 						.on('mouseout', tip.hide)
 						.each(stash);
 
-
 					function click(d) {
-						node = d;
-						path.transition()
-							.duration(1000)
-							.attrTween('d', arcTweenZoom(d));
+						if (d !== node) {
+							node = d;
+							path.transition()
+								.duration(1000)
+								.attrTween('d', arcTweenZoom(d));
+						}
 					}
-
-				});
+				}
 
 				function stash(d) {
 					d.x0 = d.x;
 					d.dx0 = d.dx;
 				}
 
+				function rescale() {
+
+					sunburst.selectAll('path')
+						.transition()
+						.duration(1000)
+						.call(y);
+				}
+
 				function arcTweenZoom(d) {
 					var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
 						yd = d3.interpolate(y.domain(), [d.y, 1]),
-						yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+						yr = d3.interpolate(y.range(), [d.y ? 30 : 0, radius]);
 
 					return function (d, i) {
 						return i ?

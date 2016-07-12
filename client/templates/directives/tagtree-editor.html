@@ -1,0 +1,15 @@
+<script type="text/ng-template" id="tag_nodes_renderer.html">
+	<div tag-inline-editor tag="tag"></div>
+	<ol ui-tree-nodes ng-model="tag.children">
+		<li ng-repeat="tag in tag.children" ui-tree-node ng-include="'tag_nodes_renderer.html'">
+		</li>
+	</ol>
+</script>
+
+<div ui-tree="treeOptions" id="tree-root">
+	<ol ui-tree-nodes="" ng-model="tags.children" >
+		<li ng-repeat="tag in tags.children" ui-tree-node data-expand-on-hover ng-include="'tag_nodes_renderer.html'"></li>
+	</ol>
+</div>
+
+

@@ -191,3 +191,21 @@ path {
   border: 1px solid #444;
   display: inline-block;
 }
+
+
+.d3-sunburst {
+  display: block;
+  width: 100%;
+}
+
+.sunburst-50 {
+  width: 50vw;
+  height: 50vh;
+}
+
+.d3-tip {
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  border-radius: 2px;
+  padding: 0.2em;
+}

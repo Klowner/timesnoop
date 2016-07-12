@@ -73,7 +73,7 @@ func totalsUnmatchedHandler(w http.ResponseWriter, r *http.Request) {
 func TagIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	j, _ := json.Marshal(GetDB().GetTags())
+	j, _ := json.Marshal(GetDB().GetTags(false))
 	w.Write(j)
 }
 
@@ -162,7 +162,7 @@ func totalsByTagHandler(w http.ResponseWriter, r *http.Request) {
 		matchers = GetMatchers()
 	}
 
-	totals := GetTotalsByTag(events_all, matchers, true)
+	totals := GetTotalsByTag(events_all, matchers, false)
 
 	w.Header().Set("Content-Type", "application/json")
 	j, _ := json.Marshal(totals)
@@ -174,8 +174,8 @@ func totalsByTagTreeHandler(w http.ResponseWriter, r *http.Request) {
 	var matchers *[]CompiledMatchExpression
 
 	matchers = GetMatchers()
-	totals := GetTotalsByTag(events_all, matchers, true)
-	tree := ShiftDownDurations(BuildTagTotalsTree(totals))
+	totals := GetTotalsByTag(events_all, matchers, false)
+	tree := TotalUpDurations(BuildTagTotalsTree(totals))
 
 	w.Header().Set("Content-Type", "application/json")
 	j, _ := json.Marshal(tree)

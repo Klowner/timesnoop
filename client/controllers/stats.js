@@ -2,8 +2,9 @@ var _ = require('lodash'),
 	d3 = require('d3');
 
 module.exports = function (app) {
-	app.controller('StatsController', function ($scope, $stateParams, $state, StatsService, Stats, Tag) {
+	app.controller('StatsController', function ($scope, $stateParams, $state, $window, StatsService, Stats, Tag) {
 
+		angular.element($window).on('resize', function () { $scope.$apply(); });
 		/*
 		$scope.chart = {
 			data: {
